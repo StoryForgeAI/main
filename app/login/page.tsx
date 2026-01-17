@@ -20,7 +20,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      setErrorMsg("Invalid login credentials!");
+      setErrorMsg("Access denied. Please check your credentials.");
       setLoading(false);
     } else {
       router.push("/dashboard");
@@ -37,51 +37,257 @@ export default function LoginPage() {
   };
 
   return (
-    <main style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>StoryForge AI</h1>
-        <p style={styles.subtitle}>Welcome back</p>
+    <main className="auth-container">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+        :root {
+          --emerald: #10b981;
+          --cyan: #06b6d4;
+          --deep-blue: #020617;
+        }
+
+        body {
+          margin: 0;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          background-color: var(--deep-blue);
+          color: white;
+          overflow: hidden;
+        }
+
+        .auth-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          position: relative;
+        }
+
+        /* --- AURORA ANIMATION --- */
+        .aurora-bg {
+          position: fixed;
+          top: 0; left: 0; width: 100%; height: 100%;
+          z-index: -1;
+          background: var(--deep-blue);
+        }
+
+        .aurora-layer {
+          position: absolute;
+          width: 150%; height: 150%; top: -25%; left: -25%;
+          background: radial-gradient(circle at 50% 50%, 
+            rgba(6, 182, 212, 0.1) 0%, 
+            rgba(16, 185, 129, 0.08) 30%, 
+            transparent 60%);
+          filter: blur(120px);
+          animation: aurora-pulse 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes aurora-pulse {
+          from { transform: scale(1) translate(0, 0); opacity: 0.5; }
+          to { transform: scale(1.2) translate(5%, 5%); opacity: 0.8; }
+        }
+
+        /* --- GLASS CARD --- */
+        .glass-card {
+          width: 100%;
+          max-width: 420px;
+          background: rgba(255, 255, 255, 0.02);
+          backdrop-filter: blur(25px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 40px;
+          padding: 60px 45px;
+          text-align: center;
+          box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+          animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        .brand-title {
+          font-size: 2.2rem;
+          font-weight: 800;
+          letter-spacing: -2px;
+          margin-bottom: 10px;
+        }
+
+        .brand-title span {
+          color: var(--emerald);
+        }
+
+        .subtitle {
+          color: #9ca3af;
+          margin-bottom: 40px;
+          font-size: 1rem;
+          font-weight: 500;
+          letter-spacing: 0.5px;
+        }
+
+        .input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+          margin-bottom: 30px;
+        }
+
+        .auth-input {
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 18px 24px;
+          color: white;
+          font-size: 1rem;
+          outline: none;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .auth-input:focus {
+          border-color: var(--cyan);
+          background: rgba(6, 182, 212, 0.05);
+          box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
+        }
+
+        .submit-btn {
+          background: linear-gradient(135deg, var(--emerald), var(--cyan));
+          color: #020617;
+          font-weight: 800;
+          padding: 20px;
+          border-radius: 20px;
+          border: none;
+          cursor: pointer;
+          font-size: 1.1rem;
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+          transition: all 0.3s ease;
+          box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+          transform: translateY(-3px);
+          box-shadow: 0 20px 40px rgba(6, 182, 212, 0.4);
+          filter: brightness(1.1);
+        }
+
+        .divider {
+          display: flex;
+          align-items: center;
+          margin: 35px 0;
+          color: #4b5563;
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: 1px;
+        }
+
+        .divider::before, .divider::after {
+          content: '';
+          flex: 1;
+          border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .divider:not(:empty)::before { margin-right: 20px; }
+        .divider:not(:empty)::after { margin-left: 20px; }
+
+        .google-btn {
+          width: 100%;
+          padding: 18px;
+          border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.1);
+          background: transparent;
+          color: white;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+
+        .google-btn:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .footer-text {
+          margin-top: 40px;
+          font-size: 0.95rem;
+          color: #6b7280;
+        }
+
+        .link {
+          color: var(--cyan);
+          text-decoration: none;
+          font-weight: 700;
+          margin-left: 6px;
+          transition: color 0.2s;
+        }
+
+        .link:hover {
+          color: var(--emerald);
+        }
+
+        .error-msg {
+          color: #ef4444;
+          background: rgba(239, 68, 68, 0.1);
+          padding: 12px;
+          border-radius: 12px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          margin-top: 15px;
+        }
+      `}</style>
+
+      {/* Aurora Background */}
+      <div className="aurora-bg">
+        <div className="aurora-layer"></div>
+      </div>
+
+      <div className="glass-card">
+        <h1 className="brand-title">STORY<span>FORGE</span></h1>
+        <p className="subtitle">Resume your creative dominion.</p>
         
-        <form onSubmit={handleLogin} style={styles.form}>
-          <input name="email" type="email" placeholder="Email" required style={styles.input} />
-          <input name="password" type="password" placeholder="Password" required style={styles.input} />
+        <form onSubmit={handleLogin}>
+          <div className="input-group">
+            <input 
+              name="email" 
+              type="email" 
+              placeholder="Commander Email" 
+              required 
+              className="auth-input" 
+            />
+            <input 
+              name="password" 
+              type="password" 
+              placeholder="Secret Key" 
+              required 
+              className="auth-input" 
+            />
+          </div>
           
-          <button disabled={loading} style={styles.btn}>
-            {loading ? "..." : "LOGIN"}
+          <button disabled={loading} className="submit-btn" style={{width: '100%'}}>
+            {loading ? "AUTHENTICATING..." : "ENTER DASHBOARD"}
           </button>
 
           {errorMsg && (
-            <p style={{ color: '#ef4444', fontWeight: 'bold', fontSize: '14px', marginTop: '5px' }}>
+            <div className="error-msg">
               {errorMsg}
-            </p>
+            </div>
           )}
         </form>
 
-        <div style={styles.divider}>or</div>
+        <div className="divider">SECURE ACCESS</div>
 
-        {/* Google Gomb */}
-        <button onClick={handleGoogleAuth} style={styles.googleBtn}>
-          <img src="https://www.google.com/favicon.ico" width="18" alt="G" /> Sign in with Google
+        <button onClick={handleGoogleAuth} className="google-btn">
+          <img src="https://www.google.com/favicon.ico" width="18" alt="G" />
+          Authorize with Google
         </button>
-
-        <p style={styles.footerText}>
-          Don't have an account? <a href="/register" style={styles.link}>Sign up!</a>
+        
+        <p className="footer-text">
+          New to the forge? <a href="/register" className="link">Join the elite.</a>
         </p>
       </div>
     </main>
   );
 }
-
-const styles: any = {
-  container: { display: 'flex', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#10b981', paddingTop: '60px', fontFamily: 'sans-serif' },
-  card: { width: '100%', maxWidth: '380px', backgroundColor: 'white', borderRadius: '30px', padding: '40px', textAlign: 'center', height: 'fit-content', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' },
-  title: { color: '#065f46', fontWeight: '900', fontSize: '24px', margin: '0 0 5px 0' },
-  subtitle: { color: '#6b7280', marginBottom: '25px', fontSize: '15px' },
-  form: { display: 'flex', flexDirection: 'column', gap: '15px' },
-  input: { padding: '15px', borderRadius: '15px', border: '1px solid #e5e7eb', backgroundColor: '#f9fafb', outline: 'none', fontSize: '16px' },
-  btn: { backgroundColor: '#10b981', color: 'white', fontWeight: 'bold', padding: '15px', borderRadius: '15px', border: 'none', cursor: 'pointer', fontSize: '16px' },
-  divider: { margin: '20px 0', color: '#9ca3af', fontSize: '14px', fontWeight: '500' },
-  googleBtn: { width: '100%', padding: '14px', borderRadius: '15px', border: '1px solid #e5e7eb', backgroundColor: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontWeight: '600', color: '#374151' },
-  footerText: { marginTop: '25px', fontSize: '14px', color: '#6b7280' },
-  link: { color: '#10b981', textDecoration: 'none', fontWeight: 'bold' }
-};
