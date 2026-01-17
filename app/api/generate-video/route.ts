@@ -9,7 +9,8 @@ const YTDLP_PATH = "C:\\Users\\sarko\\Desktop\\ffmpeg-8.0.1-essentials_build\\bi
 
 ffmpeg.setFfmpegPath(FFMPEG_PATH);
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<Response> {
+
   try {
     const body = await req.json();
     const { videoId, start, end, bgMusic, musicVol, videoVol } = body;
