@@ -45,4 +45,12 @@ dist
 build
 .vercel
 .env
-
+public/**/*.mp4 
+public/**/*.mp3 
+public/**/*.wav 
+public/**/*.png 
+public/**/*.jpg 
+public/**/*.jpeg 
+public/**/*.svg 
+public/uploads/ 
+public/outputs/
