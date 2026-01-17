@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function RegisterPage() {
@@ -62,7 +62,10 @@ export default function RegisterPage() {
           justify-content: center;
           align-items: center;
           min-height: 100vh;
+          width: 100vw;
           position: relative;
+          padding: 20px;
+          box-sizing: border-box;
         }
 
         /* --- AURORA ANIMATION --- */
@@ -89,18 +92,19 @@ export default function RegisterPage() {
           to { transform: rotate(360deg); }
         }
 
-        /* --- GLASS CARD --- */
+        /* --- FIXED GLASS CARD --- */
         .glass-card {
           width: 100%;
-          maxWidth: 420px;
+          max-width: 420px; /* EZ JAVÍTJA KI A SZÉLESSÉGET */
           background: rgba(255, 255, 255, 0.03);
-          backdrop-filter: blur(20px);
+          backdrop-filter: blur(25px);
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 40px;
           padding: 50px 40px;
           text-align: center;
-          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
           animation: slideUp 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+          box-sizing: border-box;
         }
 
         @keyframes slideUp {
@@ -112,7 +116,7 @@ export default function RegisterPage() {
           font-size: 2rem;
           font-weight: 800;
           letter-spacing: -1.5px;
-          margin-bottom: 8px;
+          margin: 0 0 8px 0;
         }
 
         .brand-title span {
@@ -142,6 +146,8 @@ export default function RegisterPage() {
           font-size: 1rem;
           outline: none;
           transition: all 0.3s ease;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .auth-input:focus {
@@ -163,17 +169,13 @@ export default function RegisterPage() {
           letter-spacing: 1px;
           transition: all 0.3s ease;
           box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+          width: 100%;
         }
 
         .submit-btn:hover:not(:disabled) {
           transform: translateY(-2px);
           box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
           filter: brightness(1.1);
-        }
-
-        .submit-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
         }
 
         .divider {
@@ -209,11 +211,20 @@ export default function RegisterPage() {
           gap: 12px;
           font-weight: 600;
           transition: all 0.3s ease;
+          box-sizing: border-box;
         }
 
         .google-btn:hover {
           background: rgba(255, 255, 255, 0.05);
           border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .status-msg {
+          padding: 12px;
+          border-radius: 12px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          margin-bottom: 20px;
         }
 
         .footer-text {
@@ -228,21 +239,8 @@ export default function RegisterPage() {
           font-weight: 700;
           margin-left: 5px;
         }
-
-        .link:hover {
-          text-decoration: underline;
-        }
-
-        .status-msg {
-          padding: 12px;
-          border-radius: 12px;
-          font-size: 0.9rem;
-          font-weight: 600;
-          margin-bottom: 20px;
-        }
       `}</style>
 
-      {/* Aurora Background */}
       <div className="aurora-bg">
         <div className="aurora-layer"></div>
       </div>
@@ -278,7 +276,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <button disabled={loading} className="submit-btn" style={{width: '100%'}}>
+          <button disabled={loading} className="submit-btn">
             {loading ? "INITIALIZING..." : "CLAIM ACCESS"}
           </button>
         </form>
