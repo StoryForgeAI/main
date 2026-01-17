@@ -1,265 +1,382 @@
 "use client";
-import React from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 export default function LandingPage() {
-  const router = useRouter();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleGetStarted = () => {
     window.location.href = "https://sforge.vercel.app/dashboard";
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.mainWrapper}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
         
-        body {
-          margin: 0;
-          font-family: 'Inter', sans-serif;
-          background-color: #000;
+        :root {
+          --emerald: #10b981;
+          --deep-forest: #064e3b;
+          --black: #050505;
         }
 
-        .hero-title {
-          font-size: 4rem;
-          font-weight: 900;
-          line-height: 1.1;
-          margin-bottom: 1.5rem;
-          background: linear-gradient(to bottom right, #10b981, #064e3b);
+        body {
+          margin: 0;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          background-color: var(--black);
+          color: white;
+          overflow-x: hidden;
+        }
+
+        /* Background Animation */
+        .bg-glow {
+          position: fixed;
+          top: 0; left: 0; width: 100%; height: 100%;
+          background: radial-gradient(circle at 50% -20%, #064e3b 0%, transparent 50%);
+          z-index: -1;
+          opacity: 0.6;
+        }
+
+        .floating {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+          100% { transform: translateY(0px); }
+        }
+
+        .hero-gradient {
+          background: linear-gradient(135deg, #fff 30%, #10b981 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
 
-        .fade-in {
-          animation: fadeIn 1.5s ease-out;
+        .glass-card {
+          background: rgba(255, 255, 255, 0.03);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(16, 185, 129, 0.1);
+          border-radius: 32px;
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+        .glass-card:hover {
+          background: rgba(16, 185, 129, 0.05);
+          transform: translateY(-10px) scale(1.02);
+          border-color: var(--emerald);
         }
 
-        .btn-glow:hover {
-          box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        .cta-button {
+          background: var(--emerald);
+          color: #000;
+          padding: 20px 48px;
+          border-radius: 100px;
+          font-weight: 800;
+          font-size: 1.2rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .cta-button:hover {
           transform: scale(1.05);
+          box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+          background: #34d399;
+        }
+
+        .text-reveal {
+          animation: reveal 1s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        @keyframes reveal {
+          0% { opacity: 0; transform: translateY(30px); }
+          100% { opacity: 1; transform: translateY(0); }
         }
       `}</style>
 
+      <div className="bg-glow" />
+
+      {/* Navigation */}
+      <nav style={{
+        ...styles.nav,
+        backgroundColor: scrolled ? 'rgba(5, 5, 5, 0.8)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(20px)' : 'none'
+      }}>
+        <div style={styles.navContent}>
+          <div style={styles.logo}>STORY<span style={{color: '#10b981'}}>FORGE</span></div>
+          <button onClick={handleGetStarted} style={styles.navBtn}>Launch App</button>
+        </div>
+      </nav>
+
       {/* Hero Section */}
-      <section style={styles.heroSection} className="fade-in">
-        <div style={styles.badge}>NEW: Sora AI video generátor elérhető</div>
-        <h1 className="hero-title">A Leggyorsabb Út a<br />Virális Videókhoz</h1>
-        <p style={styles.heroSubtitle}>
-          Az AI eszköztár videógeneráláshoz, forgatókönyvíráshoz, szinkronizáláshoz és feliratozáshoz. 
-          Minden, amire szükséged van a tartalomgyártáshoz, egyetlen platformon.
-        </p>
-        <button 
-          onClick={handleGetStarted} 
-          style={styles.mainButton} 
-          className="btn-glow"
-        >
-          GET STARTED
-        </button>
-        <div style={styles.trustedBy}>
-          <span style={{color: '#4b5563'}}>Több millió megtekintéssel rendelkező alkotók bizalmával.</span>
+      <header style={styles.hero}>
+        <div className="text-reveal" style={styles.heroTextContainer}>
+          <div style={styles.statusBadge}>
+            <span style={styles.dot}>●</span> 
+            SORA AI VIDEO ENGINE IS NOW LIVE
+          </div>
+          <h1 className="hero-gradient" style={styles.mainTitle}>
+            Turn Your Ideas Into <br /> 
+            <span style={{fontStyle: 'italic'}}>Viral Masterpieces</span>
+          </h1>
+          <p style={styles.heroSub}>
+            The world's first all-in-one AI creative suite designed for the next generation of content kings. 
+            Script, voice, edit, and dominate every social algorithm in seconds.
+          </p>
+          <div style={styles.btnGroup}>
+            <button onClick={handleGetStarted} className="cta-button">Start Creating For Free</button>
+            <p style={styles.noCredit}>No credit card required • Instant access</p>
+          </div>
+        </div>
+
+        {/* Floating Visual Element */}
+        <div className="floating" style={styles.visualElement}>
+           <div className="glass-card" style={styles.previewBox}>
+              <div style={styles.timelineRow}>
+                <div style={{...styles.timelineBar, width: '40%', background: '#10b981'}}></div>
+                <div style={{...styles.timelineBar, width: '25%', background: '#064e3b'}}></div>
+                <div style={{...styles.timelineBar, width: '15%', background: '#065f46'}}></div>
+              </div>
+              <div style={styles.mockupTitle}>Generating Viral Hook... 88%</div>
+           </div>
+        </div>
+      </header>
+
+      {/* Social Proof */}
+      <section style={styles.statsSection}>
+        <div style={styles.statsGrid}>
+          <div style={styles.statItem}><h3>10M+</h3><p>Videos Created</p></div>
+          <div style={styles.statItem}><h3>95%</h3><p>Faster Workflow</p></div>
+          <div style={styles.statItem}><h3>4.9/5</h3><p>Creator Rating</p></div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section style={styles.featuresSection}>
-        <h2 style={styles.sectionTitle}>Funkciók a Legjobb Videókhoz</h2>
-        <div style={styles.featuresGrid}>
-          <div style={styles.featureCard}>
-            <h3 style={styles.featureTitle}>AI Scripting</h3>
-            <p style={styles.featureText}>Generálj azonnal kiváló minőségű forgatókönyveket. Csak írd le az ötleted vagy illessz be egy YouTube linket.</p>
+      {/* Features Grid */}
+      <section style={styles.features}>
+        <div style={styles.sectionHeader}>
+          <h2 style={styles.sectionTitle}>Built for Speed. <br/>Engineered for Reach.</h2>
+          <p style={styles.sectionDesc}>Stop wasting hours on technical hurdles. Let our AI handle the grunt work while you focus on the vision.</p>
+        </div>
+
+        <div style={styles.grid}>
+          <div className="glass-card" style={styles.card}>
+            <div style={styles.icon}>⚡</div>
+            <h3>Hyper-Realistic Voiceovers</h3>
+            <p>100+ human-like voices in 40+ languages. Your audience won't believe it's AI.</p>
           </div>
-          <div style={styles.featureCard}>
-            <h3 style={styles.featureTitle}>AI Voiceovers</h3>
-            <p style={styles.featureText}>Készíts professzionális szinkronhangokat a videóidhoz anélkül, hogy szinkronszínészt kellene felfogadnod.</p>
+          <div className="glass-card" style={styles.card}>
+            <div style={styles.icon}>🎬</div>
+            <h3>Smart Scene Selection</h3>
+            <p>Our AI analyzes your script and automatically pulls the most engaging B-roll footage.</p>
           </div>
-          <div style={styles.featureCard}>
-            <h3 style={styles.featureTitle}>Caption Presets</h3>
-            <p style={styles.featureText}>Válassz a virális csatornák által használt felirat-előbeállítások könyvtárából.</p>
+          <div className="glass-card" style={styles.card}>
+            <div style={styles.icon}>🔥</div>
+            <h3>Viral Hook Generator</h3>
+            <p>Stuck? Let Sora AI write the first 3 seconds that stop the scroll every single time.</p>
           </div>
-          <div style={styles.featureCard}>
-            <h3 style={styles.featureTitle}>Intelligens Editor</h3>
-            <p style={styles.featureText}>Vágj, igazíts és adj hozzá effekteket – mindezt egy zökkenőmentes munkaterületen.</p>
+          <div className="glass-card" style={styles.card}>
+            <div style={styles.icon}>📈</div>
+            <h3>Algorithm Optimizer</h3>
+            <p>Automatically formats your content for TikTok, Reels, and Shorts simultaneously.</p>
           </div>
         </div>
       </section>
 
-      {/* Content Section */}
-      <section style={styles.contentSection}>
-        <div style={styles.contentWrapper}>
-          <div style={styles.textContent}>
-            <h2 style={styles.subTitle}>Miért a Story Forge AI?</h2>
-            <p style={styles.longText}>
-              A modern tartalomgyártás világában az idő a legértékesebb kincsed. A Story Forge AI-t úgy terveztük, 
-              hogy a kreatív folyamat nehéz részét levegye a válladról. Legyen szó TikTok-ról, YouTube Shorts-ról 
-              vagy Instagram Reels-ről, algoritmusaink segítenek a figyelemfelkeltő "hook-ok" megalkotásában.
-            </p>
-            <p style={styles.longText}>
-              Ne pazarolj órákat az unalmas vágási feladatokra. AI-nk automatikusan szinkronizálja a feliratokat 
-              a hanggal, kiválasztja a legjobb háttérzenét és optimalizálja a videó ritmusát a maximális elköteleződés érdekében.
-            </p>
-          </div>
-          <div style={styles.imagePlaceholder}>
-            {/* Ide jöhet egy kép a felületről */}
-            <div style={styles.mockup}>
-              <div style={styles.mockupBar}></div>
-              <div style={styles.mockupContent}>AI GENERATED PREVIEW</div>
-            </div>
-          </div>
+      {/* Final Call to Action */}
+      <section style={styles.finalCta}>
+        <div className="glass-card" style={styles.ctaBox}>
+          <h2 style={{fontSize: '3rem', marginBottom: '1.5rem'}}>Ready to dominate?</h2>
+          <p style={{fontSize: '1.2rem', color: '#9ca3af', marginBottom: '2.5rem'}}>
+            Join 50,000+ creators who are already scaling their channels with StoryForge.
+          </p>
+          <button onClick={handleGetStarted} className="cta-button">Get Started Now</button>
         </div>
       </section>
 
-      {/* Footer */}
       <footer style={styles.footer}>
-        <p>© 2024 Story Forge AI. Minden jog fenntartva.</p>
+        <p>© 2026 StoryForge AI. Crafted for the bold.</p>
       </footer>
     </div>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: {
-    backgroundColor: '#000',
-    color: '#fff',
-    minHeight: '100vh',
+  mainWrapper: {
+    paddingTop: '80px',
   },
-  heroSection: {
+  nav: {
+    position: 'fixed',
+    top: 0, width: '100%',
+    zIndex: 1000,
+    transition: 'all 0.3s ease',
+  },
+  navContent: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '20px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  logo: {
+    fontSize: '1.5rem',
+    fontWeight: 800,
+    letterSpacing: '-1px',
+  },
+  navBtn: {
+    background: 'transparent',
+    color: '#fff',
+    border: '1px solid #10b981',
+    padding: '10px 24px',
+    borderRadius: '100px',
+    cursor: 'pointer',
+    fontWeight: 600,
+  },
+  hero: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
     textAlign: 'center',
-    padding: '100px 20px',
-    maxWidth: '1000px',
-    margin: '0 auto',
+    padding: '120px 20px',
+    position: 'relative',
   },
-  badge: {
+  heroTextContainer: {
+    maxWidth: '900px',
+    zIndex: 2,
+  },
+  statusBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
     background: 'rgba(16, 185, 129, 0.1)',
     color: '#10b981',
-    padding: '8px 16px',
-    borderRadius: '20px',
-    fontSize: '0.9rem',
-    fontWeight: 'bold',
+    padding: '8px 20px',
+    borderRadius: '100px',
+    fontSize: '0.8rem',
+    fontWeight: 700,
     marginBottom: '2rem',
     border: '1px solid rgba(16, 185, 129, 0.2)',
   },
-  heroSubtitle: {
-    fontSize: '1.25rem',
+  dot: {
+    marginRight: '8px',
+    fontSize: '10px',
+  },
+  mainTitle: {
+    fontSize: 'clamp(3rem, 8vw, 5.5rem)',
+    fontWeight: 800,
+    margin: '0 0 2rem 0',
+    lineHeight: 0.9,
+  },
+  heroSub: {
+    fontSize: '1.4rem',
     color: '#9ca3af',
-    maxWidth: '700px',
-    marginBottom: '3rem',
-    lineHeight: '1.6',
+    lineHeight: 1.6,
+    marginBottom: '3.5rem',
+    maxWidth: '750px',
+    marginInline: 'auto',
   },
-  mainButton: {
-    backgroundColor: '#10b981',
-    color: '#000',
-    padding: '18px 40px',
-    borderRadius: '12px',
-    fontSize: '1.1rem',
-    fontWeight: '900',
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
+  btnGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '15px',
   },
-  trustedBy: {
-    marginTop: '3rem',
-    fontSize: '0.9rem',
+  noCredit: {
+    fontSize: '0.85rem',
+    color: '#4b5563',
   },
-  featuresSection: {
-    padding: '80px 20px',
-    backgroundColor: '#050505',
-    textAlign: 'center',
+  visualElement: {
+    marginTop: '60px',
+    width: '100%',
+    maxWidth: '600px',
   },
-  sectionTitle: {
-    fontSize: '2.5rem',
-    marginBottom: '3rem',
-    color: '#fff',
-  },
-  featuresGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-    gap: '30px',
-    maxWidth: '1200px',
-    margin: '0 auto',
-  },
-  featureCard: {
-    background: '#0a0a0a',
-    padding: '40px',
-    borderRadius: '24px',
-    border: '1px solid #1a1a1a',
+  previewBox: {
+    padding: '30px',
     textAlign: 'left',
   },
-  featureTitle: {
+  timelineRow: {
+    display: 'flex',
+    gap: '10px',
+    height: '40px',
+    marginBottom: '20px',
+  },
+  timelineBar: {
+    borderRadius: '8px',
+  },
+  mockupTitle: {
     color: '#10b981',
-    fontSize: '1.5rem',
-    marginBottom: '1rem',
+    fontWeight: 600,
+    fontSize: '0.9rem',
   },
-  featureText: {
-    color: '#9ca3af',
-    lineHeight: '1.5',
+  statsSection: {
+    padding: '60px 20px',
+    borderTop: '1px solid rgba(255,255,255,0.05)',
+    borderBottom: '1px solid rgba(255,255,255,0.05)',
   },
-  contentSection: {
-    padding: '100px 20px',
+  statsGrid: {
+    maxWidth: '1000px',
+    margin: '0 auto',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    textAlign: 'center',
+  },
+  statItem: {
+    h3: { fontSize: '2.5rem', margin: 0, color: '#10b981' },
+    p: { color: '#6b7280', margin: '5px 0 0 0' }
+  },
+  features: {
+    padding: '120px 20px',
     maxWidth: '1200px',
     margin: '0 auto',
   },
-  contentWrapper: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '60px',
-    alignItems: 'center',
+  sectionHeader: {
+    textAlign: 'center',
+    marginBottom: '80px',
   },
-  textContent: {
-    flex: '1 1 400px',
-  },
-  subTitle: {
-    fontSize: '2.5rem',
-    marginBottom: '2rem',
-  },
-  longText: {
-    color: '#9ca3af',
-    fontSize: '1.1rem',
-    lineHeight: '1.8',
+  sectionTitle: {
+    fontSize: '3.5rem',
+    fontWeight: 800,
     marginBottom: '1.5rem',
   },
-  imagePlaceholder: {
-    flex: '1 1 400px',
-    display: 'flex',
-    justifyContent: 'center',
+  sectionDesc: {
+    color: '#9ca3af',
+    fontSize: '1.2rem',
+    maxWidth: '600px',
+    margin: '0 auto',
   },
-  mockup: {
-    width: '100%',
-    maxWidth: '500px',
-    height: '350px',
-    background: '#0a0a0a',
-    borderRadius: '12px',
-    border: '1px solid #1a1a1a',
-    position: 'relative',
-    overflow: 'hidden',
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '30px',
   },
-  mockupBar: {
-    height: '30px',
-    background: '#1a1a1a',
-    width: '100%',
+  card: {
+    padding: '50px 40px',
   },
-  mockupContent: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 'calc(100% - 30px)',
-    color: '#10b981',
-    fontWeight: 'bold',
-    opacity: 0.5,
+  icon: {
+    fontSize: '2.5rem',
+    marginBottom: '20px',
+  },
+  finalCta: {
+    padding: '120px 20px',
+    textAlign: 'center',
+  },
+  ctaBox: {
+    maxWidth: '800px',
+    margin: '0 auto',
+    padding: '80px 40px',
   },
   footer: {
-    padding: '40px 20px',
+    padding: '60px 20px',
     textAlign: 'center',
-    borderTop: '1px solid #1a1a1a',
-    color: '#4b5563',
+    color: '#374151',
     fontSize: '0.9rem',
   }
 };
