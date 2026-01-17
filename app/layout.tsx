@@ -1,8 +1,20 @@
-export default function Home() {
+// app/layout.tsx
+import "./globals.css";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "StoryForge",
+  description: "AI Story and Video Generator",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <main style={{ padding: 40 }}>
-      <h1>StoryForge működik! 🚀</h1>
-      <p>Ez már a saját kezdőoldalad.</p>
-    </main>
+    <html lang="hu">
+      <body>{children}</body>
+    </html>
   );
 }
