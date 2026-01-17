@@ -174,7 +174,7 @@ export default function StoryForgeLanding() {
       {/* Hero Section */}
       <section style={styles.hero}>
         <div style={styles.badge}>REVOLUTIONIZING CONTENT WITH SORA AI</div>
-        <h1 className="hero-title">Escape The <br/> Average.</h1>
+        <h1 className="hero-title">The future.</h1>
         <p style={styles.heroSub}>
           The elite AI platform for creators who demand viral success. We don't just generate video; 
           we engineer digital dopamine for your audience.
