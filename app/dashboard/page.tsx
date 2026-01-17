@@ -46,11 +46,7 @@ export default function DashboardPage() {
     else { setUserCredits(newTotal); alert(`Success! ${amount} credits added.`); }
   };
 
-  if (!user) return (
-    <div style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100vh', backgroundColor:'#020617'}}>
-       <p style={styles.loading}>INITIALIZING STORYFORGE AI...</p>
-    </div>
-  );
+  if (!user) return <p style={styles.loading}>Loading StoryForge AI...</p>;
 
   const renderContent = () => {
     switch (activeTab) {
@@ -63,14 +59,23 @@ export default function DashboardPage() {
 
             <div style={styles.socialProofBar}>
                 <div style={styles.proofItem}>⭐ 4.9/5 TrustScore</div>
-                <div style={styles.proofItem}>👥 100K+ Creators</div>
+                <div style={styles.proofItem}>👥 100K+ Active Creators</div>
                 <div style={styles.proofItem}>🔥 1M+ Clips Generated</div>
             </div>
 
+            {/* FOLYAMATOSAN MENŐ VIDEÓ */}
             <div style={styles.videoShowcaseContainer}>
                 <div style={styles.videoWrapper}>
-                    <video autoPlay loop muted playsInline style={{width: '100%', height: '100%', objectFit: 'cover'}}>
+                    <video 
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline 
+                        style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                    >
                         <source src="/promo_video.mp4" type="video/mp4" />
+                        {/* Ha nincs videód még, egy YouTube embed is mehet ide, de az AutoPlay-hez ezek a paraméterek kellenek: */}
+                        {/* <iframe width="100%" height="100%" src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe> */}
                     </video>
                 </div>
                 <div style={styles.videoDescription}>
@@ -86,7 +91,7 @@ export default function DashboardPage() {
             </div>
 
             <div style={styles.featureGrid}>
-              <div style={{...styles.featureCard, border: '1px solid rgba(16, 185, 129, 0.3)', background: 'rgba(16, 185, 129, 0.05)'}}>
+              <div style={{...styles.featureCard, border: '1px solid #10b981', background: 'rgba(16, 185, 129, 0.05)'}}>
                 <div style={styles.iconCircle}>⚡</div>
                 <h3 style={styles.featureTitle}>Instant Creation</h3>
                 <p style={styles.featureText}>Generate viral-ready scripts and clips in under 60 seconds. High retention guaranteed.</p>
@@ -108,32 +113,58 @@ export default function DashboardPage() {
         );
 
       case "Create":
-        return (
-          <div style={{...styles.heroSection, alignItems: 'flex-start', textAlign: 'left'}}>
-            <h1 style={styles.glowTitle}>The Studio</h1>
-            <p style={{color: '#94a3b8', marginBottom: '30px', fontSize: '16px'}}>Select a professional AI tool to start your viral journey!</p>
-            
-            <div style={{...styles.createToolContainer, flexWrap: 'wrap', gap: '25px'}}>
-              {/* Tool kártyák a kért stílusban */}
-              {[
-                { id: "flash", title: "Flash Create", usage: "20 credits", img: "/flash.png", desc: "Make viral clips in 1 minute using Flash technology!", btn: "START", route: "/flashcreate" },
-                { id: "analyze", title: "Channel Analyze", usage: "15-45 credits", img: "/analyze.png", desc: "Analyze any niche and get a full AI content schedule.", btn: "ANALYZE", route: "/analyze" },
-                { id: "story", title: "Story Generator", usage: "25 credits", img: "/story.png", desc: "Create hook-heavy viral scripts and plot twists instantly.", btn: "WRITE STORY", route: "/storygen" },
-                { id: "script", title: "Script Generator", usage: "5 credits", img: "/script.png", desc: "Turn any idea into a high-retention script via GPT-4o.", btn: "GENERATE SCRIPT", route: "/scriptwriter" }
-              ].map(tool => (
-                <div key={tool.id} style={styles.verticalToolCard}>
-                  <img src={tool.img} alt={tool.title} style={styles.verticalToolImage} />
-                  <div style={styles.toolContent}>
-                    <h3 style={styles.toolTitle}>{tool.title}</h3>
-                    <p style={styles.toolUsage}>Usage: <span style={{color: '#10b981'}}>{tool.usage}</span></p>
-                    <p style={styles.toolDescription}>{tool.desc}</p>
-                    <button onClick={() => router.push(tool.route)} style={styles.startBtn}>{tool.btn}</button>
-                  </div>
-                </div>
-              ))}
-            </div>
+  return (
+    <div style={{...styles.heroSection, alignItems: 'flex-start', textAlign: 'left'}}>
+      <h1 style={styles.glowTitle}>The Studio</h1>
+      <p style={{color: '#94a3b8', marginBottom: '30px', fontSize: '16px'}}>Select a professional AI tool to start your viral journey for FREE!</p>
+      
+      <div style={{...styles.createToolContainer, flexWrap: 'wrap', gap: '25px'}}>
+        {/* FLASH CREATE */}
+        <div style={styles.verticalToolCard}>
+          <img src="/flash.png" alt="Flash Create" style={styles.verticalToolImage} />
+          <div style={styles.toolContent}>
+            <h3 style={styles.toolTitle}>Flash Create</h3>
+            <p style={styles.toolUsage}>Usage: <span style={{color: '#0e9119'}}>20 credits</span></p>
+            <p style={styles.toolDescription}>Make viral clips in 1 minute using Flash Create technology!</p>
+            <button onClick={() => router.push("/flashcreate")} style={styles.startBtn}>START</button>
           </div>
-        );
+        </div>
+
+        {/* CHANNEL ANALYZE */}
+        <div style={{...styles.verticalToolCard, border: '1px solid #0e9119'}}>
+          <img src="/analyze.png" alt="Channel Analyze" style={styles.verticalToolImage} />
+          <div style={styles.toolContent}>
+            <h3 style={{...styles.toolTitle, color: '#ffffff'}}>Channel Analyze</h3>
+            <p style={styles.toolUsage}>Usage: <span style={{color: '#0e9119'}}>15 - 45 credits</span></p>
+            <p style={styles.toolDescription}>Analyze any channel niche and get a full AI content schedule.</p>
+            <button onClick={() => router.push("/analyze")} style={{...styles.startBtn, backgroundColor: '#07db47'}}>ANALYZE</button>
+          </div>
+        </div>
+
+        {/* STORY GENERATOR */}
+        <div style={{...styles.verticalToolCard, border: '1px solid #0e9119'}}>
+          <img src="/story.png" alt="Story Generator" style={styles.verticalToolImage} />
+          <div style={styles.toolContent}>
+            <h3 style={{...styles.toolTitle, color: '#ffffff'}}>Story Generator</h3>
+            <p style={styles.toolUsage}>Usage: <span style={{color: '#0e9119'}}>25 credits</span></p>
+            <p style={styles.toolDescription}>Create hook-heavy viral scripts and plot twists instantly.</p>
+            <button onClick={() => router.push("/storygen")} style={{...styles.startBtn, backgroundColor: '#07db47'}}>WRITE STORY</button>
+          </div>
+        </div>
+
+        {/* ÚJ: SCRIPT GENERATOR */}
+        <div style={{...styles.verticalToolCard, border: '1px solid #0e9119'}}>
+          <img src="/script.png" alt="Script Generator" style={styles.verticalToolImage} />
+          <div style={styles.toolContent}>
+            <h3 style={{...styles.toolTitle, color: '#ffffff'}}>Script Generator</h3>
+            <p style={styles.toolUsage}>Usage: <span style={{color: '#0e9119'}}>5 credits</span></p>
+            <p style={styles.toolDescription}>Turn any idea into a high-retention video script via ChatGPT-4o API.</p>
+            <button onClick={() => router.push("/scriptwriter")} style={{...styles.startBtn, backgroundColor: '#07db47', boxShadow: '0 4px 14px 0 rgba(167, 139, 250, 0.3)'}}>GENERATE SCRIPT</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
       case "Credits":
         return (
@@ -147,18 +178,18 @@ export default function DashboardPage() {
                 <ul style={styles.planList}><li>• 25 Credits</li><li>• Basic AI Voices</li><li style={styles.disabledItem}>• No Autopilot</li></ul>
                 <button onClick={() => buyCredits(25)} style={{...styles.planBtn, border: '1px solid #60a5fa', color: '#60a5fa'}}>Buy Now</button>
               </div>
+              <div style={styles.priceCard}>
+                <span style={{...styles.badge, color: '#a78bfa'}}>🟣 Pro</span>
+                <div style={styles.priceValue}>$7</div>
+                <ul style={styles.planList}><li>• 60 Credits</li><li>• Pro AI Voices</li><li>• Autopilot</li></ul>
+                <button onClick={() => buyCredits(60)} style={{...styles.planBtn, border: '1px solid #a78bfa', color: '#a78bfa'}}>Buy Now</button>
+              </div>
               <div style={{...styles.priceCard, ...styles.highlightCard}}>
                 <div style={styles.viralBadge}>BEST VALUE</div>
                 <span style={{...styles.badge, color: '#f87171'}}>🔴 Viral Clipper</span>
                 <div style={{...styles.priceValue, fontSize: '54px', color: '#f87171'}}>$13</div>
                 <ul style={styles.planList}><li>• 120 Credits</li><li>• ALL AI Features</li><li>• Unlimited Autopilot</li></ul>
                 <button onClick={() => buyCredits(120)} style={styles.viralBtn}>Buy Now</button>
-              </div>
-              <div style={styles.priceCard}>
-                <span style={{...styles.badge, color: '#a78bfa'}}>🟣 Pro</span>
-                <div style={styles.priceValue}>$7</div>
-                <ul style={styles.planList}><li>• 60 Credits</li><li>• Pro AI Voices</li><li>• Autopilot</li></ul>
-                <button onClick={() => buyCredits(60)} style={{...styles.planBtn, border: '1px solid #a78bfa', color: '#a78bfa'}}>Buy Now</button>
               </div>
             </div>
           </div>
@@ -212,11 +243,6 @@ export default function DashboardPage() {
 
   return (
     <main style={styles.container}>
-      {/* Aurora Background Layer */}
-      <div style={styles.auroraBg}>
-        <div style={styles.auroraLayer}></div>
-      </div>
-
       <aside style={styles.sidebar}>
         <div style={styles.logoArea}>
           <div style={styles.logoFlexWrapper}>
@@ -226,20 +252,9 @@ export default function DashboardPage() {
         </div>
         <nav style={styles.nav}>
           {["Dashboard", "Credits", "Profile", "About Us"].map((tab) => (
-            <button key={tab} onClick={() => setActiveTab(tab)} style={{
-              ...styles.navItem, 
-              backgroundColor: activeTab === tab ? "rgba(16, 185, 129, 0.2)" : "transparent", 
-              color: activeTab === tab ? "white" : "#9ca3af",
-              border: activeTab === tab ? "1px solid rgba(16, 185, 129, 0.4)" : "1px solid transparent"
-            }}>
-              {tab}
-            </button>
+            <button key={tab} onClick={() => setActiveTab(tab)} style={{...styles.navItem, backgroundColor: activeTab === tab ? "#10b981" : "transparent", color: activeTab === tab ? "white" : "#9ca3af"}}>{tab}</button>
           ))}
-          <div style={styles.createWrapper}>
-            <button onClick={() => setActiveTab("Create")} style={styles.imageBtnBase}>
-              <img src="/plusz.png" alt="Create" style={styles.plusImage} />
-            </button>
-          </div>
+          <div style={styles.createWrapper}><button onClick={() => setActiveTab("Create")} style={styles.imageBtnBase}><img src="/plusz.png" alt="Create" style={styles.plusImage} /></button></div>
         </nav>
         <div style={styles.userInfoBox}>
           <p style={styles.userEmailSidebar}>{user.email}</p>
@@ -247,122 +262,95 @@ export default function DashboardPage() {
         </div>
         <button onClick={async () => { await supabase.auth.signOut(); router.push("/login"); }} style={styles.logoutBtn}>Logout</button>
       </aside>
-
       <section style={styles.contentArea}>
         <div style={styles.topBar}>
           <div style={styles.creditBadge}><span style={styles.creditAmount}>🪙 {userCredits} CREDITS</span></div>
         </div>
         <div style={styles.card}>{renderContent()}</div>
       </section>
-
-      <style>{`
-        @keyframes aurora-rotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </main>
   );
 }
 
+// ... Stílusok maradnak az előzőek, minden benne van ...
 const styles: { [key: string]: React.CSSProperties } = {
-  container: { display: 'flex', height: '100vh', backgroundColor: '#020617', color: '#f8fafc', fontFamily: '"Plus Jakarta Sans", sans-serif', overflow: 'hidden', position: 'relative' },
-  
-  // Aurora háttér
-  auroraBg: { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, background: '#020617', pointerEvents: 'none' },
-  auroraLayer: { position: 'absolute', width: '200%', height: '200%', top: '-50%', left: '-50%', background: 'radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, rgba(6, 182, 212, 0.05) 25%, transparent 50%)', filter: 'blur(100px)', animation: 'aurora-rotate 30s linear infinite' },
-
-  // Sidebar (Glassmorphism)
-  sidebar: { width: '280px', minWidth: '280px', background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column', padding: '40px 20px', borderRight: '1px solid rgba(255, 255, 255, 0.08)', zIndex: 1 },
+  container: { display: 'flex', height: '100vh', backgroundColor: '#020617', color: '#f8fafc', fontFamily: '"Inter", sans-serif', overflow: 'hidden' },
+  sidebar: { width: '280px', minWidth: '280px', backgroundColor: '#0f172a', display: 'flex', flexDirection: 'column', padding: '40px 20px', borderRight: '1px solid #1e293b' },
   logoArea: { marginBottom: '50px' },
   logoFlexWrapper: { display: 'flex', alignItems: 'center', gap: '12px' },
-  sidebarLogoIcon: { width: '50px', height: '50px', borderRadius: '12px' },
-  logoText: { color: 'white', fontWeight: '800', fontSize: '22px', margin: 0, letterSpacing: '-1px' },
-  nav: { display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 },
-  navItem: { width: '100%', border: 'none', textAlign: 'left', padding: '14px 20px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', borderRadius: '16px', transition: 'all 0.3s' },
+  sidebarLogoIcon: { width: '120px', height: '120px', borderRadius: '12px' },
+  logoText: { color: 'white', fontWeight: '900', fontSize: '22px', margin: 0 },
+  nav: { display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 },
+  navItem: { width: '100%', border: 'none', textAlign: 'left', padding: '14px 20px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', borderRadius: '16px', transition: 'all 0.2s' },
   createWrapper: { marginTop: '20px', display: 'flex', justifyContent: 'center' },
-  plusImage: { width: '70px', height: '70px', filter: 'drop-shadow(0 0 15px rgba(16, 185, 129, 0.4))' },
-  imageBtnBase: { background: 'none', border: 'none', cursor: 'pointer', transition: 'transform 0.2s' },
-  userInfoBox: { padding: '20px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '20px', marginBottom: '15px', border: '1px solid rgba(255, 255, 255, 0.05)' },
-  userEmailSidebar: { fontSize: '11px', color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis' },
+  plusImage: { width: '80px', height: '80px', filter: 'drop-shadow(0 0 15px rgba(16, 185, 129, 0.5))' },
+  imageBtnBase: { background: 'none', border: 'none', cursor: 'pointer' },
+  userInfoBox: { padding: '20px', backgroundColor: '#1e293b', borderRadius: '20px', marginBottom: '15px', border: '1px solid #334155' },
+  userEmailSidebar: { fontSize: '11px', color: '#94a3b8', overflow: 'hidden' },
   userCreditLineSidebar: { fontSize: '16px', fontWeight: 'bold', color: '#10b981', marginTop: '5px' },
-  logoutBtn: { marginTop: 'auto', padding: '14px', color: '#ef4444', background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '16px', cursor: 'pointer', fontWeight: '800' },
-
-  // Content Area
-  contentArea: { flex: 1, padding: '30px', display: 'flex', flexDirection: 'column', overflowY: 'auto', zIndex: 1, position: 'relative' },
-  topBar: { display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' },
-  creditBadge: { background: 'rgba(16, 185, 129, 0.1)', padding: '10px 25px', borderRadius: '50px', border: '1px solid rgba(16, 185, 129, 0.3)' },
-  creditAmount: { fontWeight: '900', color: '#10b981', fontSize: '14px' },
-  card: { background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(15px)', width: '100%', maxWidth: '1200px', borderRadius: '40px', padding: '50px', border: '1px solid rgba(255, 255, 255, 0.05)', alignSelf: 'center' },
-
-  // Hero & Content
+  contentArea: { flex: 1, padding: '20px', display: 'flex', flexDirection: 'column', overflowY: 'auto' },
+  topBar: { display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' },
+  creditBadge: { backgroundColor: '#0f172a', padding: '10px 25px', borderRadius: '50px', border: '1px solid #10b981' },
+  creditAmount: { fontWeight: '900', color: 'white', fontSize: '14px' },
+  card: { backgroundColor: '#0f172a', width: '100%', maxWidth: '1250px', borderRadius: '40px', padding: '60px', border: '1px solid #1e293b', alignSelf: 'center' },
   heroSection: { textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' },
-  glowTitle: { fontSize: '42px', fontWeight: '900', color: 'white', marginBottom: '20px', lineHeight: '1.1', letterSpacing: '-1.5px' },
-  heroSubtitle: { fontSize: '17px', color: '#94a3b8', maxWidth: '700px', marginBottom: '40px', lineHeight: '1.6' },
-  welcomeBadge: { background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', padding: '8px 20px', borderRadius: '50px', fontSize: '11px', fontWeight: '900', marginBottom: '20px', border: '1px solid rgba(16, 185, 129, 0.2)' },
-  socialProofBar: { display: 'flex', gap: '25px', marginBottom: '40px', padding: '12px 35px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '100px', border: '1px solid rgba(255, 255, 255, 0.05)' },
-  proofItem: { fontSize: '13px', fontWeight: '700', color: '#f8fafc' },
-  
-  // Video & Stats
-  videoShowcaseContainer: { width: '100%', maxWidth: '850px', marginBottom: '50px', borderRadius: '30px', overflow: 'hidden', border: '1px solid rgba(255, 255, 255, 0.08)' },
-  videoWrapper: { width: '100%', aspectRatio: '16/9', background: '#000' },
-  videoDescription: { padding: '20px', background: 'rgba(30, 41, 59, 0.5)', textAlign: 'left' },
-  statsOverview: { display: 'flex', gap: '15px', marginBottom: '40px', width: '100%' },
-  miniStat: { background: 'rgba(255, 255, 255, 0.03)', padding: '20px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.05)', flex: 1 },
-  miniStatLabel: { display: 'block', fontSize: '11px', color: '#94a3b8', marginBottom: '5px', textTransform: 'uppercase' },
-  miniStatValue: { fontSize: '17px', fontWeight: '800', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' },
-  onlineDot: { width: '8px', height: '8px', backgroundColor: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981' },
-  
-  // Features & Tools
-  featureGrid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', width: '100%' },
-  featureCard: { padding: '35px', borderRadius: '30px', background: 'rgba(255, 255, 255, 0.02)', textAlign: 'left', border: '1px solid rgba(255, 255, 255, 0.05)' },
-  iconCircle: { fontSize: '35px', marginBottom: '15px' },
-  featureTitle: { fontSize: '22px', fontWeight: '800', color: '#10b981', marginBottom: '12px' },
-  featureText: { fontSize: '14px', color: '#94a3b8', lineHeight: '1.5' },
-  actionBtn: { width: '100%', padding: '16px', background: 'linear-gradient(135deg, #10b981, #06b6d4)', border: 'none', borderRadius: '15px', color: '#020617', fontWeight: '800', cursor: 'pointer', marginTop: '15px' },
-  secondaryBtn: { width: '100%', padding: '16px', background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '15px', color: 'white', fontWeight: '800', cursor: 'pointer', marginTop: '15px' },
-  trendBox: { marginTop: '40px', padding: '18px', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '18px', border: '1px dashed rgba(16, 185, 129, 0.3)', display: 'flex', gap: '15px', alignItems: 'center' },
-  
-  // Create Studio
-  createToolContainer: { display: 'flex', width: '100%' },
-  verticalToolCard: { background: 'rgba(255, 255, 255, 0.03)', width: '260px', borderRadius: '28px', border: '1px solid rgba(255, 255, 255, 0.05)', overflow: 'hidden', transition: 'transform 0.3s' },
-  verticalToolImage: { width: '100%', height: '150px', objectFit: 'cover', opacity: 0.8 },
-  toolContent: { padding: '20px' },
-  toolTitle: { fontSize: '19px', fontWeight: '800', color: 'white', marginBottom: '5px' },
-  toolUsage: { fontSize: '13px', fontWeight: '600' },
-  toolDescription: { fontSize: '13px', color: '#94a3b8', margin: '12px 0', minHeight: '40px' },
-  startBtn: { width: '100%', padding: '12px', background: '#10b981', border: 'none', borderRadius: '12px', color: '#020617', fontWeight: '800', cursor: 'pointer' },
-  
-  // Pricing
-  pricingGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', width: '100%', marginTop: '30px' },
-  priceCard: { background: 'rgba(255, 255, 255, 0.03)', padding: '30px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center' },
-  highlightCard: { border: '2px solid rgba(248, 113, 113, 0.5)', background: 'rgba(248, 113, 113, 0.05)', transform: 'scale(1.05)' },
-  viralBadge: { background: '#f87171', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '9px', fontWeight: '900', marginBottom: '10px' },
-  badge: { fontSize: '15px', fontWeight: '800', marginBottom: '10px' },
-  priceValue: { fontSize: '38px', fontWeight: '900', color: 'white' },
-  planList: { listStyle: 'none', padding: 0, margin: '20px 0', textAlign: 'left', fontSize: '13px', color: '#94a3b8' },
+  glowTitle: { fontSize: '50px', fontWeight: '950', color: 'white', marginBottom: '20px', lineHeight: '1.1' },
+  heroSubtitle: { fontSize: '18px', color: '#94a3b8', maxWidth: '800px', marginBottom: '40px' },
+  welcomeBadge: { backgroundColor: '#10b98122', color: '#10b981', padding: '8px 20px', borderRadius: '50px', fontSize: '12px', fontWeight: '900', marginBottom: '20px', border: '1px solid #10b98144' },
+  socialProofBar: { display: 'flex', gap: '30px', marginBottom: '50px', padding: '15px 40px', backgroundColor: '#1e293b', borderRadius: '100px', border: '1px solid #334155' },
+  proofItem: { fontSize: '14px', fontWeight: '800', color: '#f8fafc' },
+  videoShowcaseContainer: { width: '100%', maxWidth: '900px', marginBottom: '60px', borderRadius: '32px', overflow: 'hidden', border: '1px solid #334155' },
+  videoWrapper: { width: '100%', aspectRatio: '16/9', backgroundColor: 'black' },
+  videoDescription: { padding: '20px', backgroundColor: '#1e293b', textAlign: 'left' },
+  statsOverview: { display: 'flex', gap: '20px', marginBottom: '40px', width: '100%', justifyContent: 'center' },
+  miniStat: { backgroundColor: '#1e293b', padding: '20px', borderRadius: '24px', border: '1px solid #334155', flex: 1 },
+  miniStatLabel: { display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '5px' },
+  miniStatValue: { fontSize: '18px', fontWeight: '900', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' },
+  onlineDot: { width: '10px', height: '10px', backgroundColor: '#10b981', borderRadius: '50%' },
+  featureGrid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '25px', width: '100%' },
+  featureCard: { padding: '40px', borderRadius: '32px', backgroundColor: '#1e293b', textAlign: 'left' },
+  iconCircle: { fontSize: '40px', marginBottom: '20px' },
+  featureTitle: { fontSize: '24px', fontWeight: '900', color: '#10b981', marginBottom: '15px' },
+  featureText: { fontSize: '15px', color: '#94a3b8', lineHeight: '1.6' },
+  actionBtn: { width: '100%', padding: '18px', backgroundColor: '#10b981', border: 'none', borderRadius: '16px', color: 'white', fontWeight: '900', cursor: 'pointer', marginTop: '20px' },
+  secondaryBtn: { width: '100%', padding: '18px', backgroundColor: 'transparent', border: '1px solid #334155', borderRadius: '16px', color: 'white', fontWeight: '900', cursor: 'pointer', marginTop: '20px' },
+  trendBox: { marginTop: '50px', padding: '20px', backgroundColor: '#020617', borderRadius: '20px', border: '1px dashed #10b981', display: 'flex', gap: '15px' },
+  pricingGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', width: '100%' },
+  priceCard: { backgroundColor: '#1e293b', padding: '30px', borderRadius: '24px', border: '1px solid #334155', display: 'flex', flexDirection: 'column', alignItems: 'center' },
+  highlightCard: { border: '2px solid #f87171', transform: 'scale(1.05)' },
+  viralBadge: { backgroundColor: '#f87171', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '10px', fontWeight: 'bold', marginBottom: '10px' },
+  badge: { fontSize: '16px', fontWeight: '800', marginBottom: '15px' },
+  priceValue: { fontSize: '42px', fontWeight: '900', color: 'white' },
+  planList: { listStyle: 'none', padding: 0, margin: '20px 0', textAlign: 'left', fontSize: '14px' },
   disabledItem: { color: '#4b5563', textDecoration: 'line-through' },
-  planBtn: { width: '100%', padding: '12px', borderRadius: '12px', background: 'transparent', fontWeight: '800', cursor: 'pointer', transition: '0.3s' },
+  planBtn: { width: '100%', padding: '12px', borderRadius: '12px', background: 'transparent', fontWeight: 'bold', cursor: 'pointer' },
   viralBtn: { width: '100%', padding: '15px', borderRadius: '12px', background: '#f87171', border: 'none', color: 'white', fontWeight: '900', cursor: 'pointer' },
-
-  // Profile & About
+  createToolContainer: { display: 'flex', width: '100%', marginTop: '30px' },
+  verticalToolCard: { backgroundColor: '#1e293b', width: '320px', borderRadius: '28px', border: '1px solid #334155', overflow: 'hidden' },
+  verticalToolImage: { width: '100%', height: '180px', objectFit: 'cover' },
+  toolContent: { padding: '20px' },
+  toolTitle: { fontSize: '22px', fontWeight: 'bold', color: 'white' },
+  toolUsage: { fontSize: '14px', color: '#94a3b8' },
+  toolDescription: { fontSize: '14px', color: '#94a3b8', margin: '15px 0' },
+  startBtn: { width: '100%', padding: '12px', backgroundColor: '#07db47', border: 'none', borderRadius: '12px', color: 'white', fontWeight: '900', cursor: 'pointer' },
   profileContainer: { width: '100%' },
-  profileGridMain: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px' },
-  profileCardSide: { background: 'rgba(255, 255, 255, 0.03)', padding: '30px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.05)' },
-  statsBox: { display: 'flex', flexDirection: 'column', gap: '12px' },
-  infoRow: { display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '8px' },
-  infoLabel: { color: '#94a3b8', fontSize: '13px' },
-  infoValue: { color: 'white', fontSize: '13px', fontWeight: '700' },
+  profileGridMain: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' },
+  profileCardSide: { backgroundColor: '#1e293b', padding: '30px', borderRadius: '24px', border: '1px solid #334155' },
+  statsBox: { display: 'flex', flexDirection: 'column', gap: '15px' },
+  infoRow: { display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '8px' },
+  infoLabel: { color: '#94a3b8', fontSize: '14px' },
+  infoValue: { color: 'white', fontSize: '14px', fontWeight: 'bold' },
   inputGroup: { marginBottom: '20px' },
-  inputLabel: { display: 'block', fontSize: '11px', color: '#94a3b8', marginBottom: '8px', textTransform: 'uppercase' },
-  profileInput: { width: '100%', padding: '14px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', outline: 'none' },
-  saveBtn: { width: '100%', padding: '14px', background: '#10b981', border: 'none', borderRadius: '12px', color: '#020617', fontWeight: '800' },
-  aboutText: { fontSize: '17px', color: '#94a3b8', maxWidth: '750px', marginBottom: '30px', lineHeight: '1.6' },
+  inputLabel: { display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '8px' },
+  profileInput: { width: '100%', padding: '14px', backgroundColor: '#020617', border: '1px solid #334155', borderRadius: '12px', color: 'white' },
+  saveBtn: { width: '100%', padding: '14px', backgroundColor: '#10b981', border: 'none', borderRadius: '12px', color: 'white', fontWeight: 'bold' },
+  aboutText: { fontSize: '18px', color: '#94a3b8', maxWidth: '800px', marginBottom: '30px' },
   aboutGrid: { display: 'flex', gap: '20px', marginBottom: '40px' },
-  aboutCard: { background: 'rgba(255, 255, 255, 0.03)', padding: '30px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.05)', flex: 1, textAlign: 'left' },
-  authorSection: { marginTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '30px' },
-  signature: { fontSize: '17px', color: 'white' },
-  highlightName: { color: '#10b981', fontWeight: '800' },
-  copyright: { color: '#4b5563', fontSize: '11px', marginTop: '10px' },
-  loading: { textAlign: 'center', color: '#10b981', fontSize: '18px', fontWeight: '900', letterSpacing: '2px' }
+  aboutCard: { backgroundColor: '#1e293b', padding: '30px', borderRadius: '24px', border: '1px solid #334155', flex: 1, textAlign: 'left' },
+  authorSection: { marginTop: '20px', borderTop: '1px solid #334155', paddingTop: '30px' },
+  signature: { fontSize: '18px' },
+  highlightName: { color: '#10b981', fontWeight: 'bold' },
+  copyright: { color: '#64748b', fontSize: '12px', marginTop: '10px' },
+  loading: { textAlign: 'center', marginTop: '100px', color: '#10b981', fontSize: '20px', fontWeight: '900' },
+  logoutBtn: { marginTop: 'auto', padding: '14px', color: '#ef4444', background: 'transparent', border: '1px solid #ef4444', borderRadius: '16px', cursor: 'pointer', fontWeight: '800' }
 };
