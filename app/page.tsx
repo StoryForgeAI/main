@@ -11,7 +11,7 @@ export default function StoryForgeLanding() {
   }, []);
 
   const handleGetStarted = () => {
-    window.location.href = "https://sforge.vercel.app/dashboard";
+    window.location.href = "https://aistoryforge.vercel.app/dashboard";
   };
 
   return (
