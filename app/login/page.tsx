@@ -38,7 +38,6 @@ export default function LoginPage() {
         method: "POST",
         body: JSON.stringify({ credential: credentialResponse.credential }),
       });
-
       const json = await res.json();
       if (json.error || !res.ok) {
         setErrorMsg("Google login failed.");
@@ -76,50 +75,31 @@ export default function LoginPage() {
         .submit-btn { background: linear-gradient(135deg, var(--emerald), var(--cyan)); color: #020617; font-weight: 800; padding: 20px; border-radius: 20px; border: none; cursor: pointer; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1.5px; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); width: 100%; }
         .divider { display: flex; align-items: center; margin: 35px 0; color: #4b5563; font-size: 0.8rem; font-weight: 700; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.06); }
-        .divider:not(:empty)::before { margin-right: 20px; }
-        .divider:not(:empty)::after { margin-left: 20px; }
         .footer-text { margin-top: 40px; font-size: 0.95rem; color: #6b7280; }
         .link { color: var(--cyan); text-decoration: none; font-weight: 700; margin-left: 6px; }
         .error-msg { color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 12px; border-radius: 12px; font-size: 0.9rem; font-weight: 600; margin-top: 15px; }
       `}</style>
 
-      <div className="aurora-bg">
-        <div className="aurora-layer"></div>
-      </div>
-
+      <div className="aurora-bg"><div className="aurora-layer"></div></div>
       <div className="glass-card">
         <h1 className="brand-title">STORY<span>FORGE</span></h1>
-        <p className="subtitle">Resume your creative dominion.</p>
-        
         <form onSubmit={handleLogin}>
           <div className="input-group">
             <input name="email" type="email" placeholder="Commander Email" required className="auth-input" />
             <input name="password" type="password" placeholder="Secret Key" required className="auth-input" />
           </div>
-          
           <button disabled={loading} className="submit-btn">
             {loading ? "AUTHENTICATING..." : "ENTER DASHBOARD"}
           </button>
-
-          {errorMsg && (
-            <div className="error-msg">
-              {errorMsg}
-            </div>
-          )}
+          {errorMsg && <div className="error-msg">{errorMsg}</div>}
         </form>
-
         <div className="divider">SECURE ACCESS</div>
-
         <GoogleLogin 
           onSuccess={handleGoogleSuccess}
           onError={handleGoogleError}
           useOneTap={false}
-          prompt="select_account"
         />
-        
-        <p className="footer-text">
-          New to the forge? <a href="/register" className="link">Join the elite.</a>
-        </p>
+        <p className="footer-text">New to the forge? <a href="/register" className="link">Join the elite.</a></p>
       </div>
     </main>
   );

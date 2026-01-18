@@ -90,46 +90,29 @@ export default function RegisterPage() {
         .link { color: var(--emerald); text-decoration: none; font-weight: 700; margin-left: 5px; }
       `}</style>
 
-      <div className="aurora-bg">
-        <div className="aurora-layer"></div>
-      </div>
-
+      <div className="aurora-bg"><div className="aurora-layer"></div></div>
       <div className="glass-card">
         <h1 className="brand-title">STORY<span>FORGE</span></h1>
-        <p className="subtitle">Start your 100x content journey today.</p>
-        
         <form onSubmit={handleRegister}>
           <div className="input-group">
             <input name="email" type="email" placeholder="Professional Email" required className="auth-input" />
             <input name="password" type="password" placeholder="Secure Password" required className="auth-input" />
           </div>
-          
           {msg.text && (
             <div className="status-msg" style={{ 
               backgroundColor: msg.type === "success" ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
               color: msg.type === "success" ? '#10b981' : '#ef4444'
-            }}>
-              {msg.text}
-            </div>
+            }}>{msg.text}</div>
           )}
-
-          <button disabled={loading} className="submit-btn">
-            {loading ? "INITIALIZING..." : "CLAIM ACCESS"}
-          </button>
+          <button disabled={loading} className="submit-btn">{loading ? "INITIALIZING..." : "CLAIM ACCESS"}</button>
         </form>
-
         <div className="divider">OR SCALE WITH</div>
-
         <GoogleLogin
           onSuccess={handleGoogleSuccess}
           onError={handleGoogleError}
           useOneTap={false}
-          prompt="select_account"
         />
-        
-        <p className="footer-text">
-          Already part of the elite? <a href="/login" className="link">Log in!</a>
-        </p>
+        <p className="footer-text">Already part of the elite? <a href="/login" className="link">Log in!</a></p>
       </div>
     </main>
   );
