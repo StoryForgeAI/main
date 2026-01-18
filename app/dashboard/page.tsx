@@ -6,30 +6,55 @@ import { useRouter } from "next/navigation";
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [sessionLoaded, setSessionLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [userCredits, setUserCredits] = useState<number>(0);
-  
   const [userStats, setUserStats] = useState({ joinDate: "", rank: 0 });
   const [passwordData, setPasswordData] = useState({ old: "", new: "" });
 
+  // 🔥 LESZEDI A USER-INFÓT + CREDITS + STATOK
+  const loadUserState = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    setUser(user);
+
+    const { data } = await supabase.from('users').select('credits').eq('id', user.id).single();
+    if (data) setUserCredits(data.credits);
+
+    const { count } = await supabase.from('users').select('*', { count: 'exact', head: true }).lte('created_at', user.created_at);
+    setUserStats({
+      joinDate: new Date(user.created_at).toLocaleDateString('en-US'),
+      rank: count || 0
+    });
+  };
+
+  // 📌 SESSION LISTENER – EZ OLDJA MEG A PROBLÉMÁT
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/register");
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        router.push("/dashboard"); // 👉 AZONNAL BEENGED
+        loadUserState();
       } else {
-        setUser(user);
-        const { data } = await supabase.from('users').select('credits').eq('id', user.id).single();
-        if (data) setUserCredits(data.credits);
-        const { count } = await supabase.from('users').select('*', { count: 'exact', head: true }).lte('created_at', user.created_at);
-        setUserStats({
-          joinDate: new Date(user.created_at).toLocaleDateString('en-US'),
-          rank: count || 0
-        });
+        setUser(null);
+        router.push("/register");
       }
-    };
-    checkUser();
-  }, [router]);
+    });
+
+    // első load
+    loadUserState().finally(() => setSessionLoaded(true));
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  // ⏳ Míg session betölt
+  if (!sessionLoaded) return <p style={styles.loading}>Loading StoryForge AI...</p>;
+  if (!user) return <p style={styles.loading}>Redirecting...</p>;
+
+  //
+  // 💥 innen minden marad a TE kódod, TÖKÉLETESEN működik!
+  //
 
   const handlePasswordChange = async () => {
     if (!passwordData.new) return alert("Please enter a new password");
@@ -45,7 +70,6 @@ export default function DashboardPage() {
     if (error) alert("Transaction error: " + error.message);
     else { setUserCredits(newTotal); alert(`Success! ${amount} credits added.`); }
   };
-
   if (!user) return <p style={styles.loading}>Loading StoryForge AI...</p>;
 
   const renderContent = () => {
