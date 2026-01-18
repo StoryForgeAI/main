@@ -272,7 +272,7 @@ useEffect(() => {
             <h1 style={styles.glowTitle}>Elevating Digital Storytelling</h1>
             <p style={styles.aboutText}>StoryForge AI is the engine of your digital empire. We transform content creation from a chore into a single click.</p>
             <div style={styles.aboutGrid}>
-              <div style={styles.aboutCard}><h3>🎯 The Mission</h3><p>We democratize content creation for everyone.</p></div>
+              <div style={styles.aboutCard}><h3>🎯 Thee Mission</h3><p>We democratize content creation for everyone.</p></div>
               <div style={styles.aboutCard}><h3>⚡ The Speed</h3><p>What used to take days now takes minutes.</p></div>
             </div>
             <div style={styles.authorSection}>
