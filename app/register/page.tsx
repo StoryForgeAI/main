@@ -33,7 +33,7 @@ export default function RegisterPage() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/dashboard`,
+        redirectTo: `https://aistoryforge.vercel.app/dashboard`,
       },
     });
   };
