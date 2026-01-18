@@ -1,13 +1,16 @@
 "use client";
+
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
+  // EMAIL + PASSWORD LOGIN
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -27,13 +30,34 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleAuth = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`,
-      },
-    });
+  // GOOGLE LOGIN VIA GOOGLE POPUP → API → SUPABASE
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+
+      const json = await res.json();
+
+      if (json.error || !res.ok) {
+        setErrorMsg("Google login failed.");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch (e) {
+      console.error(e);
+      setErrorMsg("Google authentication failed.");
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setErrorMsg("Google authentication aborted.");
   };
 
   return (
@@ -279,10 +303,11 @@ export default function LoginPage() {
 
         <div className="divider">SECURE ACCESS</div>
 
-        <button onClick={handleGoogleAuth} className="google-btn">
-          <img src="https://www.google.com/favicon.ico" width="18" alt="G" />
-          Authorize with Google
-        </button>
+        {/* GOOGLE LOGIN BUTTON */}
+        <GoogleLogin 
+          onSuccess={handleGoogleSuccess}
+          onError={handleGoogleError}
+        />
         
         <p className="footer-text">
           New to the forge? <a href="/register" className="link">Join the elite.</a>
