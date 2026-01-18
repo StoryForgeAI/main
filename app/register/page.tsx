@@ -1,10 +1,12 @@
+"use client";
+
 export const dynamic = "force-dynamic";
 
-"use client";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { GoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
+
 
 export default function RegisterPage() {
   const router = useRouter();
