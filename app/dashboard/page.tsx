@@ -349,65 +349,69 @@ const subscribe = async (priceId: string) => {
   );
 
 
-      case "Credits":
+case "Credits":
+  return (
+    <div style={styles.heroSection}>
+      <h1 style={styles.glowTitle}>Fuel Your AI Journey</h1>
 
-        return (
+      <p style={styles.heroSubtitle}>
+        Your balance: <strong>{userCredits}</strong>
+      </p>
 
-          <div style={styles.heroSection}>
+      <div style={styles.pricingGrid}>
 
-            <h1 style={styles.glowTitle}>Fuel Your AI Journey</h1>
+        {/* Starter Monthly */}
+        <div style={styles.priceCard}>
+          <span style={{ ...styles.badge, color: '#60a5fa' }}>🔵 Starter</span>
+          <div style={styles.priceValue}>$3 / month</div>
+          <ul style={styles.planList}>
+            <li>• 25 Credits</li>
+            <li>• Basic AI Voices</li>
+            <li style={styles.disabledItem}>• No Autopilot</li>
+          </ul>
 
-            <p style={styles.heroSubtitle}>Your balance: <strong>{userCredits}</strong></p>
+          <button onClick={() => subscribe("prod_ToZ9XN97yrnQGx")}>
+            Subscribe
+          </button>
+        </div>
 
-            <div style={styles.pricingGrid}>
+        {/* Pro Monthly */}
+        <div style={styles.priceCard}>
+          <span style={{ ...styles.badge, color: '#a78bfa' }}>🟣 Pro</span>
+          <div style={styles.priceValue}>$7 / month</div>
+          <ul style={styles.planList}>
+            <li>• 60 Credits</li>
+            <li>• Pro AI Voices</li>
+            <li>• Autopilot</li>
+          </ul>
 
-              <div style={styles.priceCard}>
+          <button onClick={() => subscribe("price_456PRO_MONTHLY")}>
+            Subscribe
+          </button>
+        </div>
 
-                <span style={{...styles.badge, color: '#60a5fa'}}>🔵 Starter</span>
-
-                <div style={styles.priceValue}>$3</div>
-
-                <ul style={styles.planList}><li>• 25 Credits</li><li>• Basic AI Voices</li><li style={styles.disabledItem}>• No Autopilot</li></ul>
-
-                <button onClick={() => subscribe("price_monthly_starter_123")}>
-  Buy Now
-</button>
-              </div>
-
-              <div style={styles.priceCard}>
-
-                <span style={{...styles.badge, color: '#a78bfa'}}>🟣 Pro</span>
-
-                <div style={styles.priceValue}>$7</div>
-
-                <ul style={styles.planList}><li>• 60 Credits</li><li>• Pro AI Voices</li><li>• Autopilot</li></ul>
-
-                <button onClick={() => subscribe("price_monthly_pro_456")}>
-  Buy Now
-</button>
-              </div>
-
-              <div style={{...styles.priceCard, ...styles.highlightCard}}>
-
-                <div style={styles.viralBadge}>BEST VALUE</div>
-
-                <span style={{...styles.badge, color: '#f87171'}}>🔴 Viral Clipper</span>
-
-                <div style={{...styles.priceValue, fontSize: '54px', color: '#f87171'}}>$13</div>
-
-                <ul style={styles.planList}><li>• 120 Credits</li><li>• ALL AI Features</li><li>• Unlimited Autopilot</li></ul>
-
-                <button onClick={() => subscribe("price_monthly_viral_789")}>
-  Buy Now
-</button>
-
-              </div>
-
-            </div>
-
+        {/* Viral Monthly */}
+        <div style={{ ...styles.priceCard, ...styles.highlightCard }}>
+          <div style={styles.viralBadge}>BEST VALUE</div>
+          <span style={{ ...styles.badge, color: '#f87171' }}>🔴 Viral Clipper</span>
+          <div style={{ ...styles.priceValue, fontSize: '54px', color: '#f87171' }}>
+            $13 / month
           </div>
+          <ul style={styles.planList}>
+            <li>• 120 Credits</li>
+            <li>• ALL AI Features</li>
+            <li>• Unlimited Autopilot</li>
+          </ul>
 
-        );
+          <button onClick={() => subscribe("price_789VIRAL_MONTHLY")}>
+            Subscribe
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+
 
 
       case "Profile":
