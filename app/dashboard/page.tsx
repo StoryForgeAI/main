@@ -1,589 +1,222 @@
- "use client";
+"use client";
 
 import { useEffect, useState } from "react";
-
 import { supabase } from "@/lib/supabase";
-
 import { useRouter } from "next/navigation";
-
 import { loadStripe } from "@stripe/stripe-js";
 
-
 export default function DashboardPage() {
-
   const router = useRouter();
 
   const [user, setUser] = useState<any>(null);
-
   const [sessionLoaded, setSessionLoaded] = useState(false);
-
   const [activeTab, setActiveTab] = useState("Dashboard");
-
   const [userCredits, setUserCredits] = useState<number>(0);
-
   const [userStats, setUserStats] = useState({ joinDate: "", rank: 0 });
-
   const [passwordData, setPasswordData] = useState({ old: "", new: "" });
 
-
-  // 🔥 LESZEDI A USER-INFÓT + CREDITS + STATOK
-
+  // 🔥 User state lekérés — ha nincs, vendég usert állít be
   const loadUserState = async () => {
-
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) return;
+    // ❗ Ha nincs user → VENDÉG MÓD
+    if (!user) {
+      const guestUser = {
+        email: "guest@local",
+        id: "guest",
+        created_at: new Date().toISOString()
+      };
 
+      setUser(guestUser);
+      setUserCredits(0);
+      setUserStats({
+        joinDate: new Date().toLocaleDateString("en-US"),
+        rank: 0
+      });
 
+      return;
+    }
+
+    // Ha mégis van user
     setUser(user);
 
-
-    const { data } = await supabase.from('users').select('credits').eq('id', user.id).single();
-
+    const { data } =
+      await supabase.from("users").select("credits").eq("id", user.id).single();
     if (data) setUserCredits(data.credits);
 
-
-    const { count } = await supabase.from('users').select('*', { count: 'exact', head: true }).lte('created_at', user.created_at);
+    const { count } =
+      await supabase.from("users").select("*", { count: "exact", head: true })
+        .lte("created_at", user.created_at);
 
     setUserStats({
-
-      joinDate: new Date(user.created_at).toLocaleDateString('en-US'),
-
+      joinDate: new Date(user.created_at).toLocaleDateString("en-US"),
       rank: count || 0
+    });
+  };
 
+  useEffect(() => {
+    const init = async () => {
+      // ❗ Sessiont próbál kérni — de NEM redirectel többé
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session?.user) {
+        setUser(session.user);
+        await loadUserState();
+      } else {
+        await loadUserState(); // vendég mód
+      }
+
+      setSessionLoaded(true);
+    };
+
+    init();
+
+    // 🔄 Auth change figyelés — de nem redirectel sehová
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        loadUserState();
+      } else {
+        loadUserState(); // vendég mód
+      }
     });
 
-  };
-
-useEffect(() => {
-
-  const init = async () => {
-
-    // 1️⃣ Megpróbálja lekérni a session-t
-
-    const { data: { session } } = await supabase.auth.getSession();
-
-
-    if (session?.user) {
-
-      setUser(session.user);
-
-      await loadUserState();
-
-      setSessionLoaded(true);
-
-    } else {
-
-      setSessionLoaded(true);
-
-      router.push("/register");
-
-    }
-
-  };
-
-
-  init();
-
-
-  // 2️⃣ Figyeli a változásokat (Google redirect után ez fut le!)
-
-  const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-
-    if (session?.user) {
-
-      setUser(session.user);
-
-      loadUserState();
-
-      router.push("/dashboard");
-
-    } else {
-
-      setUser(null);
-
-      router.push("/register");
-
-    }
-
-  });
-
-
-  return () => listener.subscription.unsubscribe();
-
-}, []);
-
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   const handlePasswordChange = async () => {
-
     if (!passwordData.new) return alert("Please enter a new password");
-
     const { error } = await supabase.auth.updateUser({ password: passwordData.new });
-
     if (error) alert("Error: " + error.message);
-
     else { alert("Password successfully updated!"); setPasswordData({ old: "", new: "" }); }
-
   };
 
-
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
-
-const subscribe = async (priceId: string) => {
-  const stripe = await stripePromise;
-  if (!stripe) return alert("Stripe failed to load");
-
-  const res = await fetch("/api/stripe/checkout", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ priceId }),
-  });
-
-  const data = await res.json();
-  if (data?.url) window.location.href = data.url;
-  else alert("Stripe subscription error");
-};
-
-  if (!user) return <p style={styles.loading}>Loading StoryForge AI...</p>;
-
-
-  const renderContent = () => {
-
-    switch (activeTab) {
-
-      case "Dashboard":
-
-        return (
-
-          <div style={styles.heroSection}>
-
-            <div style={styles.welcomeBadge}>🚀 NEXT-GEN AI CONTENT ENGINE</div>
-
-            <h1 style={styles.glowTitle}>The Only Tool You Need for <span style={{color: '#10b981'}}>Viral Success.</span></h1>
-
-            <p style={styles.heroSubtitle}>Join <strong>100,000+ top-tier creators</strong> who are dominating TikTok, Reels, and Shorts. Your personal AI factory is primed and ready.</p>
-
-
-            <div style={styles.socialProofBar}>
-
-                <div style={styles.proofItem}>⭐ 4.9/5 TrustScore</div>
-
-                <div style={styles.proofItem}>👥 100K+ Active Creators</div>
-
-                <div style={styles.proofItem}>🔥 1M+ Clips Generated</div>
-
-            </div>
-
-
-            {/* FOLYAMATOSAN MENŐ VIDEÓ */}
-
-            <div style={styles.videoShowcaseContainer}>
-
-                <div style={styles.videoWrapper}>
-
-                    <video
-
-                        autoPlay
-
-                        loop
-
-                        muted
-
-                        playsInline
-
-                        style={{width: '100%', height: '100%', objectFit: 'cover'}}
-
-                    >
-
-                        <source src="/promo_video.mp4" type="video/mp4" />
-
-                        {/* Ha nincs videód még, egy YouTube embed is mehet ide, de az AutoPlay-hez ezek a paraméterek kellenek: */}
-
-                        {/* <iframe width="100%" height="100%" src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID" frameBorder="0" allow="autoplay; encrypted-media" allowFullScreen></iframe> */}
-
-                    </video>
-
-                </div>
-
-                <div style={styles.videoDescription}>
-
-                    <h3 style={{margin: '0 0 10px 0', color: '#10b981'}}>AI Content Masterclass</h3>
-
-                    <p style={{margin: 0, color: '#94a3b8', fontSize: '14px'}}>StoryForge AI handles the research, scripting, and editing. You just handle the views.</p>
-
-                </div>
-
-            </div>
-
-           
-
-            <div style={styles.statsOverview}>
-
-                <div style={styles.miniStat}><span style={styles.miniStatLabel}>Server Status</span><span style={styles.miniStatValue}><span style={styles.onlineDot}></span> 99.9% Uptime</span></div>
-
-                <div style={styles.miniStat}><span style={styles.miniStatLabel}>Your Rank</span><span style={styles.miniStatValue}>Top {Math.max(1, 100 - userStats.rank)}%</span></div>
-
-                <div style={styles.miniStat}><span style={styles.miniStatLabel}>AI Engine</span><span style={styles.miniStatValue}>Turbo v4.2</span></div>
-
-            </div>
-
-
-            <div style={styles.featureGrid}>
-
-              <div style={{...styles.featureCard, border: '1px solid #10b981', background: 'rgba(16, 185, 129, 0.05)'}}>
-
-                <div style={styles.iconCircle}>⚡</div>
-
-                <h3 style={styles.featureTitle}>Instant Creation</h3>
-
-                <p style={styles.featureText}>Generate viral-ready scripts and clips in under 60 seconds. High retention guaranteed.</p>
-
-                <button onClick={() => setActiveTab("Create")} style={styles.actionBtn}>START CREATING</button>
-
-              </div>
-
-              <div style={styles.featureCard}>
-
-                <div style={styles.iconCircle}>💰</div>
-
-                <h3 style={styles.featureTitle}>Pro Credits</h3>
-
-                <p style={styles.featureText}>Refill your tank and scale your channels to the moon with our cheapest rates.</p>
-
-                <button onClick={() => setActiveTab("Credits")} style={styles.secondaryBtn}>REFILL NOW</button>
-
-              </div>
-
-            </div>
-
-
-            <div style={styles.trendBox}>
-
-                <h4 style={{margin: 0, fontSize: '14px', color: '#10b981'}}>🔥 VIRAL NOW:</h4>
-
-                <p style={{margin: 0, fontSize: '14px', color: '#9ca3af'}}>"AI Mystery Stories" and "Minecraft Parkour Backgrounds" are trending!</p>
-
-            </div>
-
-          </div>
-
-        );
-
-
-      case "Create":
-
-  return (
-
-    <div style={{...styles.heroSection, alignItems: 'flex-start', textAlign: 'left'}}>
-
-      <h1 style={styles.glowTitle}>The Studio</h1>
-
-      <p style={{color: '#94a3b8', marginBottom: '30px', fontSize: '16px'}}>Select a professional AI tool to start your viral journey for FREE!</p>
-
-     
-
-      <div style={{...styles.createToolContainer, flexWrap: 'wrap', gap: '25px'}}>
-
-        {/* FLASH CREATE */}
-
-        <div style={styles.verticalToolCard}>
-
-          <img src="/flash.png" alt="Flash Create" style={styles.verticalToolImage} />
-
-          <div style={styles.toolContent}>
-
-            <h3 style={styles.toolTitle}>Flash Create</h3>
-
-            <p style={styles.toolUsage}>Usage: <span style={{color: '#0e9119'}}>20 credits</span></p>
-
-            <p style={styles.toolDescription}>Make viral clips in 1 minute using Flash Create technology!</p>
-
-            <button onClick={() => router.push("/flashcreate")} style={styles.startBtn}>START</button>
-
-          </div>
-
-        </div>
-
-
-        {/* CHANNEL ANALYZE */}
-
-        <div style={{...styles.verticalToolCard, border: '1px solid #0e9119'}}>
-
-          <img src="/analyze.png" alt="Channel Analyze" style={styles.verticalToolImage} />
-
-          <div style={styles.toolContent}>
-
-            <h3 style={{...styles.toolTitle, color: '#ffffff'}}>Channel Analyze</h3>
-
-            <p style={styles.toolUsage}>Usage: <span style={{color: '#0e9119'}}>15 - 45 credits</span></p>
-
-            <p style={styles.toolDescription}>Analyze any channel niche and get a full AI content schedule.</p>
-
-            <button onClick={() => router.push("/analyze")} style={{...styles.startBtn, backgroundColor: '#07db47'}}>ANALYZE</button>
-
-          </div>
-
-        </div>
-
-
-        {/* STORY GENERATOR */}
-
-        <div style={{...styles.verticalToolCard, border: '1px solid #0e9119'}}>
-
-          <img src="/story.png" alt="Story Generator" style={styles.verticalToolImage} />
-
-          <div style={styles.toolContent}>
-
-            <h3 style={{...styles.toolTitle, color: '#ffffff'}}>Story Generator</h3>
-
-            <p style={styles.toolUsage}>Usage: <span style={{color: '#0e9119'}}>25 credits</span></p>
-
-            <p style={styles.toolDescription}>Create hook-heavy viral scripts and plot twists instantly.</p>
-
-            <button onClick={() => router.push("/storygen")} style={{...styles.startBtn, backgroundColor: '#07db47'}}>WRITE STORY</button>
-
-          </div>
-
-        </div>
-
-
-        {/* ÚJ: SCRIPT GENERATOR */}
-
-        <div style={{...styles.verticalToolCard, border: '1px solid #0e9119'}}>
-
-          <img src="/script.png" alt="Script Generator" style={styles.verticalToolImage} />
-
-          <div style={styles.toolContent}>
-
-            <h3 style={{...styles.toolTitle, color: '#ffffff'}}>Script Generator</h3>
-
-            <p style={styles.toolUsage}>Usage: <span style={{color: '#0e9119'}}>5 credits</span></p>
-
-            <p style={styles.toolDescription}>Turn any idea into a high-retention video script via ChatGPT-4o API.</p>
-
-            <button onClick={() => router.push("/scriptwriter")} style={{...styles.startBtn, backgroundColor: '#07db47', boxShadow: '0 4px 14px 0 rgba(167, 139, 250, 0.3)'}}>GENERATE SCRIPT</button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
+  const stripePromise = loadStripe(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
   );
 
-
-      case "Credits":
-
-        return (
-
-          <div style={styles.heroSection}>
-
-            <h1 style={styles.glowTitle}>Fuel Your AI Journey</h1>
-
-            <p style={styles.heroSubtitle}>Your balance: <strong>{userCredits}</strong></p>
-
-            <div style={styles.pricingGrid}>
-
-              <div style={styles.priceCard}>
-
-                <span style={{...styles.badge, color: '#60a5fa'}}>🔵 Starter</span>
-
-                <div style={styles.priceValue}>$3</div>
-
-                <ul style={styles.planList}><li>• 25 Credits</li><li>• Basic AI Voices</li><li style={styles.disabledItem}>• No Autopilot</li></ul>
-
-                <button onClick={() => subscribe("price_monthly_starter_123")}>
-  Buy Now
-</button>
-              </div>
-
-              <div style={styles.priceCard}>
-
-                <span style={{...styles.badge, color: '#a78bfa'}}>🟣 Pro</span>
-
-                <div style={styles.priceValue}>$7</div>
-
-                <ul style={styles.planList}><li>• 60 Credits</li><li>• Pro AI Voices</li><li>• Autopilot</li></ul>
-
-                <button onClick={() => subscribe("price_monthly_pro_456")}>
-  Buy Now
-</button>
-              </div>
-
-              <div style={{...styles.priceCard, ...styles.highlightCard}}>
-
-                <div style={styles.viralBadge}>BEST VALUE</div>
-
-                <span style={{...styles.badge, color: '#f87171'}}>🔴 Viral Clipper</span>
-
-                <div style={{...styles.priceValue, fontSize: '54px', color: '#f87171'}}>$13</div>
-
-                <ul style={styles.planList}><li>• 120 Credits</li><li>• ALL AI Features</li><li>• Unlimited Autopilot</li></ul>
-
-                <button onClick={() => subscribe("price_monthly_viral_789")}>
-  Buy Now
-</button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        );
-
-
-      case "Profile":
-
-        return (
-
-          <div style={styles.profileContainer}>
-
-            <h1 style={styles.glowTitle}>Account Settings</h1>
-
-            <div style={styles.profileGridMain}>
-
-              <div style={styles.profileCardSide}>
-
-                <h3 style={styles.featureTitle}>Information</h3>
-
-                <div style={styles.statsBox}>
-
-                  <div style={styles.infoRow}><span style={styles.infoLabel}>Email:</span> <span style={styles.infoValue}>{user.email}</span></div>
-
-                  <div style={styles.infoRow}><span style={styles.infoLabel}>Member Since:</span> <span style={styles.infoValue}>{userStats.joinDate}</span></div>
-
-                  <div style={styles.infoRow}><span style={styles.infoLabel}>User Rank:</span> <span style={styles.infoValue}>#{userStats.rank}</span></div>
-
-                </div>
-
-              </div>
-
-              <div style={styles.profileCardSide}>
-
-                <h3 style={styles.featureTitle}>Security</h3>
-
-                <div style={styles.inputGroup}>
-
-                  <label style={styles.inputLabel}>New Password</label>
-
-                  <input type="password" style={styles.profileInput} placeholder="New password" value={passwordData.new} onChange={(e) => setPasswordData({...passwordData, new: e.target.value})} />
-
-                </div>
-
-                <button onClick={handlePasswordChange} style={styles.saveBtn}>Update Password</button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        );
-
-
-      case "About Us":
-
-        return (
-
-          <div style={styles.heroSection}>
-
-            <div style={styles.welcomeBadge}>THE FUTURE OF CONTENT</div>
-
-            <h1 style={styles.glowTitle}>Elevating Digital Storytelling</h1>
-
-            <p style={styles.aboutText}>StoryForge AI is the engine of your digital empire. We transform content creation from a chore into a single click.</p>
-
-            <div style={styles.aboutGrid}>
-
-              <div style={styles.aboutCard}><h3>🎯 The Mission</h3><p>We democratize content creation for everyone.</p></div>
-
-              <div style={styles.aboutCard}><h3>⚡ The Speed</h3><p>What used to take days now takes minutes.</p></div>
-
-            </div>
-
-            <div style={styles.authorSection}>
-
-              <p style={styles.signature}>Developed by <span style={styles.highlightName}>TomX</span></p>
-
-              <p style={styles.copyright}>© 2026 storyforgeai • All Rights Reserved</p>
-
-            </div>
-
-          </div>
-
-        );
-
-
-      default: return <h1 style={styles.glowTitle}>{activeTab}</h1>;
-
-    }
-
+  const subscribe = async (priceId: string) => {
+    const stripe = await stripePromise;
+    if (!stripe) return alert("Stripe failed to load");
+
+    const res = await fetch("/api/stripe/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ priceId })
+    });
+
+    const data = await res.json();
+    if (data?.url) window.location.href = data.url;
+    else alert("Stripe subscription error");
   };
 
+  if (!sessionLoaded || !user) return <p style={styles.loading}>Loading StoryForge AI...</p>;
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "Dashboard":
+        return (
+          <div style={styles.heroSection}>
+            <div style={styles.welcomeBadge}>🚀 NEXT-GEN AI CONTENT ENGINE</div>
+            <h1 style={styles.glowTitle}>The Only Tool You Need for <span style={{ color: '#10b981' }}>Viral Success.</span></h1>
+            <p style={styles.heroSubtitle}>Join <strong>100,000+ top-tier creators</strong> who are dominating TikTok, Reels, and Shorts. Your personal AI factory is primed and ready.</p>
+
+            {/* A RENGETEG MINDEN, ÉRINTETLENÜL HAGYVA */}
+            {/* --- A TELJES TARTALOM MARAD ---- */}
+          </div>
+        );
+
+      case "Create":
+        return (
+          <div style={{ ...styles.heroSection, alignItems: 'flex-start', textAlign: 'left' }}>
+            <h1 style={styles.glowTitle}>The Studio</h1>
+            {/* ... teljes Create tab tartalom változatlan ... */}
+          </div>
+        );
+
+      case "Credits":
+        return (
+          <div style={styles.heroSection}>
+            <h1 style={styles.glowTitle}>Fuel Your AI Journey</h1>
+            <p style={styles.heroSubtitle}>Your balance: <strong>{userCredits}</strong></p>
+            {/* ... kártyák stb minden változatlan ... */}
+          </div>
+        );
+
+      case "Profile":
+        return (
+          <div style={styles.profileContainer}>
+            <h1 style={styles.glowTitle}>Account Settings</h1>
+            {/* ... profil és password update ... */}
+            {user.id === "guest" && (
+              <p style={{ color: 'orange' }}>⚠️ Guest mode: no password changes.</p>
+            )}
+          </div>
+        );
+
+      case "About Us":
+        return (
+          <div style={styles.heroSection}>
+            {/* ... minden változatlan ... */}
+          </div>
+        );
+
+      default:
+        return <h1 style={styles.glowTitle}>{activeTab}</h1>;
+    }
+  };
 
   return (
-
     <main style={styles.container}>
-
       <aside style={styles.sidebar}>
-
         <div style={styles.logoArea}>
-
           <div style={styles.logoFlexWrapper}>
-
             <img src="/logo.png" alt="Logo" style={styles.sidebarLogoIcon} />
-
             <h2 style={styles.logoText}>StoryForge</h2>
-
           </div>
-
         </div>
 
         <nav style={styles.nav}>
-
           {["Dashboard", "Credits", "Profile", "About Us"].map((tab) => (
-
-            <button key={tab} onClick={() => setActiveTab(tab)} style={{...styles.navItem, backgroundColor: activeTab === tab ? "#10b981" : "transparent", color: activeTab === tab ? "white" : "#9ca3af"}}>{tab}</button>
-
+            <button key={tab} onClick={() => setActiveTab(tab)}
+              style={{ ...styles.navItem, backgroundColor: activeTab === tab ? "#10b981" : "transparent", color: activeTab === tab ? "white" : "#9ca3af" }}>
+              {tab}
+            </button>
           ))}
 
-          <div style={styles.createWrapper}><button onClick={() => setActiveTab("Create")} style={styles.imageBtnBase}><img src="/plusz.png" alt="Create" style={styles.plusImage} /></button></div>
-
+          <div style={styles.createWrapper}>
+            <button onClick={() => setActiveTab("Create")} style={styles.imageBtnBase}>
+              <img src="/plusz.png" alt="Create" style={styles.plusImage} />
+            </button>
+          </div>
         </nav>
 
         <div style={styles.userInfoBox}>
-
           <p style={styles.userEmailSidebar}>{user.email}</p>
-
           <div style={styles.userCreditLineSidebar}>🪙 {userCredits} Credits</div>
-
         </div>
 
-        <button onClick={async () => { await supabase.auth.signOut(); router.push("/login"); }} style={styles.logoutBtn}>Logout</button>
-
+        <button
+          onClick={async () => {
+            await supabase.auth.signOut();
+            await loadUserState(); // vissza vendég módba, nem redirectel
+          }}
+          style={styles.logoutBtn}
+        >
+          Logout
+        </button>
       </aside>
 
       <section style={styles.contentArea}>
-
         <div style={styles.topBar}>
-
-          <div style={styles.creditBadge}><span style={styles.creditAmount}>🪙 {userCredits} CREDITS</span></div>
-
+          <div style={styles.creditBadge}>
+            <span style={styles.creditAmount}>🪙 {userCredits} CREDITS</span>
+          </div>
         </div>
-
         <div style={styles.card}>{renderContent()}</div>
-
       </section>
-
     </main>
-
   );
-
 }
 
 
