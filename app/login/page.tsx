@@ -312,7 +312,7 @@ export default function LoginPage() {
         />
         
         <p className="footer-text">
-          New to the forge? <a href="/register" className="link">Join the elite.</a>
+          New to the forgee? <a href="/register" className="link">Join the elite.</a>
         </p>
       </div>
     </main>
