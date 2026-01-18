@@ -580,5 +580,5 @@ const styles: { [key: string]: React.CSSProperties } = {
   highlightName: { color: "#10b981", fontWeight: "bold" },
   copyright: { color: "#64748b", fontSize: "12px", marginTop: "10px" },
   loading: { textAlign: "center", marginTop: "100px", color: "#10b981", fontSize: "20px", fontWeight: "900" },
-  logoutBtn: { marginTop: "auto", padding: "14px", color: "#ef4444", background: "transparent", border: "1px solid "#ef4444", borderRadius: "16px", cursor: "pointer", fontWeight: "800" }
+  logoutBtn: { marginTop: "auto", padding: "14px", color: "#ef4444", background: "transparent", border: "1px solid #ef4444", borderRadius: "16px", cursor: "pointer", fontWeight: "800" }
 };
