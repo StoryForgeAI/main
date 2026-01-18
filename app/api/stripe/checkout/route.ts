@@ -1,29 +1,27 @@
-import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
-  try {
-    const { priceId } = await req.json();
+  const { priceId } = await req.json();
 
+  try {
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",          // <--- EZ VÁLTOZOTT
+      mode: "subscription",
       payment_method_types: ["card"],
       line_items: [
         {
+          price: priceId,
           quantity: 1,
-          price: "prod_ToZ9XN97yrnQGx",            // <--- Dashboard Price ID
         },
       ],
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/credits`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
