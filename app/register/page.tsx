@@ -1,11 +1,15 @@
 "use client";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { GoogleLogin } from "@react-oauth/google";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState({ text: "", type: "" });
 
+  // EMAIL/PASS REGISTRATION
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -29,13 +33,33 @@ export default function RegisterPage() {
     setLoading(false);
   };
 
-  const handleGoogleAuth = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `https://aistoryforge.vercel.app/dashboard`,
-      },
-    });
+  // GOOGLE REGISTER → API → SUPABASE
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+
+      const json = await res.json();
+      if (json.error || !res.ok) {
+        setMsg({ text: "Google onboarding failed.", type: "error" });
+        setLoading(false);
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch (e) {
+      console.error(e);
+      setMsg({ text: "Google onboarding crashed.", type: "error" });
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setMsg({ text: "Google authentication aborted.", type: "error" });
   };
 
   return (
@@ -68,7 +92,6 @@ export default function RegisterPage() {
           box-sizing: border-box;
         }
 
-        /* --- AURORA ANIMATION --- */
         .aurora-bg {
           position: fixed;
           top: 0; left: 0; width: 100%; height: 100%;
@@ -92,10 +115,9 @@ export default function RegisterPage() {
           to { transform: rotate(360deg); }
         }
 
-        /* --- FIXED GLASS CARD --- */
         .glass-card {
           width: 100%;
-          max-width: 420px; /* EZ JAVÍTJA KI A SZÉLESSÉGET */
+          max-width: 420px;
           background: rgba(255, 255, 255, 0.03);
           backdrop-filter: blur(25px);
           border: 1px solid rgba(255, 255, 255, 0.08);
@@ -197,28 +219,6 @@ export default function RegisterPage() {
         .divider:not(:empty)::before { margin-right: 15px; }
         .divider:not(:empty)::after { margin-left: 15px; }
 
-        .google-btn {
-          width: 100%;
-          padding: 16px;
-          border-radius: 18px;
-          border: 1px solid rgba(255,255,255,0.1);
-          background: transparent;
-          color: white;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-          font-weight: 600;
-          transition: all 0.3s ease;
-          box-sizing: border-box;
-        }
-
-        .google-btn:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(255, 255, 255, 0.2);
-        }
-
         .status-msg {
           padding: 12px;
           border-radius: 12px;
@@ -283,10 +283,11 @@ export default function RegisterPage() {
 
         <div className="divider">OR SCALE WITH</div>
 
-        <button onClick={handleGoogleAuth} className="google-btn">
-          <img src="https://www.google.com/favicon.ico" width="18" alt="G" />
-          Continue with Google
-        </button>
+        {/* GOOGLE REGISTER */}
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={handleGoogleError}
+        />
         
         <p className="footer-text">
           Already part of the elite? <a href="/login" className="link">Log in!</a>
