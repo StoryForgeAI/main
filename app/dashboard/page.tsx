@@ -29,36 +29,53 @@ export default function DashboardPage() {
     });
   };
 useEffect(() => {
+  let isMounted = true;
+
   const init = async () => {
-    // 1️⃣ Megpróbálja lekérni a session-t
+    // 1️⃣ Megpróbáljuk lekérni a session-t
     const { data: { session } } = await supabase.auth.getSession();
 
     if (session?.user) {
-      setUser(session.user);
-      await loadUserState();
-      setSessionLoaded(true);
+      if (isMounted) {
+        setUser(session.user);
+        await loadUserState(); // Várd meg az adatok betöltését
+        setSessionLoaded(true);
+      }
     } else {
-      setSessionLoaded(true);
-      router.push("/register");
+      // 2️⃣ Ha nincs session, adjunk neki 1.5 másodperc türelmi időt, 
+      // mert a Google redirect után a cookie-k feldolgozása időbe telhet
+      setTimeout(async () => {
+        const { data: { session: retrySession } } = await supabase.auth.getSession();
+        if (!retrySession && isMounted) {
+          router.push("/register");
+        } else if (retrySession && isMounted) {
+          setUser(retrySession.user);
+          await loadUserState();
+          setSessionLoaded(true);
+        }
+      }, 1500);
     }
   };
 
   init();
 
-  // 2️⃣ Figyeli a változásokat (Google redirect után ez fut le!)
-  const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+  const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
     if (session?.user) {
-      setUser(session.user);
-      loadUserState();
-      router.push("/dashboard");
-    } else {
-      setUser(null);
-      router.push("/register");
+      if (isMounted) {
+        setUser(session.user);
+        await loadUserState();
+        setSessionLoaded(true);
+      }
+    } else if (event === 'SIGNED_OUT') {
+      if (isMounted) router.push("/register");
     }
   });
 
-  return () => listener.subscription.unsubscribe();
-}, []);
+  return () => {
+    isMounted = false;
+    listener.subscription.unsubscribe();
+  };
+}, [router]);
 
   const handlePasswordChange = async () => {
     if (!passwordData.new) return alert("Please enter a new password");
