@@ -2,18 +2,42 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST(req: Request) {
-  const { credential } = await req.json();
+  try {
+    const { credential } = await req.json();
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY! // fontos: service_key kell
-  );
+    if (!credential) {
+      return NextResponse.json({ error: 'Missing Google credential' }, { status: 400 });
+    }
 
-  const { data, error } = await supabase.auth.signInWithIdToken({
-    provider: 'google',
-    token: credential,
-  });
+    // Backend-only supabase client (SERVICE ROLE)
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    );
 
-  if (error) return NextResponse.json({ error }, { status: 400 });
-  return NextResponse.json({ data });
+    // Exchange Google One-Tap credential → Supabase user
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: credential,
+      nonce: undefined,     // important for Google One-Tap
+    });
+
+    if (error) {
+      console.error('Supabase error:', error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    // Success → return user/session
+    return NextResponse.json({ data }, { status: 200 });
+
+  } catch (err: any) {
+    console.error(err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
