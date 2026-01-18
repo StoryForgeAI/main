@@ -105,9 +105,6 @@ const stripePromise = loadStripe(
 );
 
 const subscribe = async (priceId: string) => {
-  const stripe = await stripePromise;
-  if (!stripe) return alert("Stripe failed to load");
-
   const res = await fetch("/api/stripe/checkout", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -115,8 +112,12 @@ const subscribe = async (priceId: string) => {
   });
 
   const data = await res.json();
-  if (data?.url) window.location.href = data.url;
-  else alert("Stripe subscription error");
+
+  if (data.url) {
+    window.location.href = data.url;
+  } else {
+    alert("Stripe error");
+  }
 };
 
   if (!user) return <p style={styles.loading}>Loading StoryForge AI...</p>;
@@ -353,65 +354,80 @@ case "Credits":
   return (
     <div style={styles.heroSection}>
       <h1 style={styles.glowTitle}>Fuel Your AI Journey</h1>
-
       <p style={styles.heroSubtitle}>
         Your balance: <strong>{userCredits}</strong>
       </p>
 
       <div style={styles.pricingGrid}>
-
-        {/* Starter Monthly */}
         <div style={styles.priceCard}>
-          <span style={{ ...styles.badge, color: '#60a5fa' }}>🔵 Starter</span>
-          <div style={styles.priceValue}>$3 / month</div>
+          <span style={{ ...styles.badge, color: "#60a5fa" }}>🔵 Starter</span>
+          <div style={styles.priceValue}>$3/mo</div>
           <ul style={styles.planList}>
-            <li>• 25 Credits</li>
+            <li>• 25 Credits monthly</li>
             <li>• Basic AI Voices</li>
             <li style={styles.disabledItem}>• No Autopilot</li>
           </ul>
-
-          <button onClick={() => subscribe("prod_ToZ9XN97yrnQGx")}>
+          <button
+            onClick={() => subscribe("price_1SqwtJFDoJTvC6NBh3gfWxsI")}
+            style={{
+              ...styles.planBtn,
+              border: "1px solid #60a5fa",
+              color: "#60a5fa",
+            }}
+          >
             Subscribe
           </button>
         </div>
 
-        {/* Pro Monthly */}
         <div style={styles.priceCard}>
-          <span style={{ ...styles.badge, color: '#a78bfa' }}>🟣 Pro</span>
-          <div style={styles.priceValue}>$7 / month</div>
+          <span style={{ ...styles.badge, color: "#a78bfa" }}>🟣 Pro</span>
+          <div style={styles.priceValue}>$7/mo</div>
           <ul style={styles.planList}>
-            <li>• 60 Credits</li>
+            <li>• 60 Credits monthly</li>
             <li>• Pro AI Voices</li>
             <li>• Autopilot</li>
           </ul>
-
-          <button onClick={() => subscribe("price_456PRO_MONTHLY")}>
+          <button
+            onClick={() => subscribe("price_1SqwnwFDoJTvC6NB8MBe3LZf")}
+            style={{
+              ...styles.planBtn,
+              border: "1px solid #a78bfa",
+              color: "#a78bfa",
+            }}
+          >
             Subscribe
           </button>
         </div>
 
-        {/* Viral Monthly */}
         <div style={{ ...styles.priceCard, ...styles.highlightCard }}>
           <div style={styles.viralBadge}>BEST VALUE</div>
-          <span style={{ ...styles.badge, color: '#f87171' }}>🔴 Viral Clipper</span>
-          <div style={{ ...styles.priceValue, fontSize: '54px', color: '#f87171' }}>
-            $13 / month
+          <span style={{ ...styles.badge, color: "#f87171" }}>
+            🔴 Viral Clipper
+          </span>
+          <div
+            style={{
+              ...styles.priceValue,
+              fontSize: "54px",
+              color: "#f87171",
+            }}
+          >
+            $13/mo
           </div>
           <ul style={styles.planList}>
-            <li>• 120 Credits</li>
+            <li>• 120 Credits monthly</li>
             <li>• ALL AI Features</li>
             <li>• Unlimited Autopilot</li>
           </ul>
-
-          <button onClick={() => subscribe("price_789VIRAL_MONTHLY")}>
+          <button
+            onClick={() => subscribe("price_1SqwoPFDoJTvC6NBtpqcEeyw")}
+            style={styles.viralBtn}
+          >
             Subscribe
           </button>
         </div>
-
       </div>
     </div>
   );
-
 
 
       case "Profile":
